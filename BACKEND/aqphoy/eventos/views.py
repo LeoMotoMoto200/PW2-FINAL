@@ -8,24 +8,11 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 
 
-class EventoViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    API endpoint que permite ver y listar eventos.
-    Soporta filtros por:
-    - ?categoria__nombre=Musical
-    - ?fecha=2024-12-31
-    - ?search=concierto
-    """
-    queryset = Evento.objects.all().select_related('categoria', 'organizador', 'lugar')
+class EventoViewSet(viewsets.ModelViewSet):
+    queryset = Evento.objects.all()
     serializer_class = EventoSerializer
-    
-    filterset_fields = {
-        'fecha': ['exact', 'gte', 'lte'], 
-        'categoria__nombre': ['exact', 'icontains'],
-    }
-    search_fields = ['titulo', 'descripcion', 'lugar__nombre', 'organizador__nombre']
-    filter_backends = (filters.SearchFilter, 'django_filters.rest_framework.DjangoFilterBackend')
-
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['titulo', 'descripcion']
 
 class EventoPDFView(View):
     def get(self, request, *args, **kwargs):
