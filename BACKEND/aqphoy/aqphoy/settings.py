@@ -21,6 +21,8 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+# settings.py
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -28,14 +30,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # Apps de terceros
     'rest_framework',
     'corsheaders',
     'django_filters',
-
-    # Mis Apps
-    'eventos',
+    
+    'eventos', # <--- ¡ESTA LÍNEA ES ESENCIAL!
 ]
 
 MIDDLEWARE = [
@@ -50,7 +49,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'arequipahoy_project.urls'
+ROOT_URLCONF = 'aqphoy.urls'
 
 TEMPLATES = [
     {
@@ -69,7 +68,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'arequipahoy_project.wsgi.application'
+WSGI_APPLICATION = 'aqphoy.wsgi.application'
 
 
 # Database
