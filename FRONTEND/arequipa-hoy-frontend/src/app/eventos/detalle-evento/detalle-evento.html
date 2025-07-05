@@ -1,1 +1,8 @@
-<p>detalle-evento works!</p>
+<div class="container mt-4">
+    <h2>{{ evento.titulo }}</h2>
+    <img [src]="evento.imagen" class="img-fluid mb-3">
+    <p><strong>Fecha:</strong> {{ evento.fecha }} - {{ evento.hora }}</p>
+    <p><strong>Lugar:</strong> {{ evento.lugar }}</p>
+    <p><strong>Categoría:</strong> {{ evento.categoria }}</p>
+    <p>{{ evento.descripcion }}</p>
+  </div>

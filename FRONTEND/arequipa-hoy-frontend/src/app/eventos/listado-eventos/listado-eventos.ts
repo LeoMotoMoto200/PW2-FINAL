@@ -6,10 +6,10 @@ import { RouterModule } from '@angular/router'; // Necesario para routerLink
   selector: 'app-listado-eventos',
   standalone: true, // Esto indica que el componente gestiona sus propias dependencias
   imports: [CommonModule, RouterModule], // Importamos los módulos aquí
-  templateUrl: './listado-eventos.component.html', // Corregí el nombre para seguir la convención
-  styleUrl: './listado-eventos.component.css'
+  templateUrl: './listado-eventos.html', // Corregí el nombre para seguir la convención
+  styleUrl: './listado-eventos.css'
 })
-export class ListadoEventosComponent {
+export class ListadoEventos {
 
   // Aquí creamos la lista de eventos simulados tal como dice la guía
   eventos = [
