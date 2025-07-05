@@ -7,6 +7,10 @@ class Categoria(models.Model):
     def __str__(self):
             return self.nombre
 
+class Lugar(models.Model):
+    direccion = models.TextField()
+    mapa = models.URLField(blank=False, max_length=200)
+
 class Evento(models.Model):
     titulo= models.CharField(max_length=100, blank=False)
     descripcion= models.TextField()
@@ -14,10 +18,10 @@ class Evento(models.Model):
     hora= models.TimeField()
     imagen = models.ImageField(upload_to='eventos/', default='eventos/default.jpg')
     categoria = models.ManyToManyField(Categoria, verbose_name="Categorías del evento")
+    lugar = models.ForeignKey(Lugar, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['-fecha', '-hora'] 
 
     def __str__(self):
             return self.titulo
-    
