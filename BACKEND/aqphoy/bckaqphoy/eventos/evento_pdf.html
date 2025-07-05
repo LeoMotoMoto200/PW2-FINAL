@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle del Evento: {{ evento.titulo }}</title>
+    <style>
+        @page {
+            size: a4 portrait;
+            @frame content_frame {
+                left: 50pt;
+                width: 512pt;
+                top: 50pt;
+                height: 692pt;
+            }
+        }
+        body {
+            font-family: "Helvetica", "Arial", sans-serif;
+            color: #333;
+        }
+        h1 {
+            color: #0056b3;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+        .container {
+            width: 100%;
+        }
+        .info-block {
+            margin-bottom: 20px;
+        }
+        .info-block strong {
+            display: inline-block;
+            width: 120px;
+            color: #555;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            text-align: center;
+            font-size: 10px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ evento.titulo }}</h1>
+        
+        <div class="info-block">
+            <h2>Información General</h2>
+            <p><strong>Fecha:</strong> {{ evento.fecha|date:"d F, Y" }}</p>
+            <p><strong>Hora:</strong> {{ evento.hora|time:"H:i" }}</p>
+            <p><strong>Categoría:</strong> {{ evento.categoria.nombre|default:"No especificada" }}</p>
+        </div>
+
+        <div class="info-block">
+            <h2>Lugar y Organizador</h2>
+            <p><strong>Lugar:</strong> {{ evento.lugar.nombre|default:"No especificado" }}</p>
+            <p><strong>Dirección:</strong> {{ evento.lugar.direccion|default:"No especificada" }}</p>
+            <p><strong>Organizador:</strong> {{ evento.organizador.nombre|default:"No especificado" }}</p>
+        </div>
+
+        <div class="info-block">
+            <h2>Descripción del Evento</h2>
+            <p>{{ evento.descripcion|linebreaksbr }}</p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Documento generado por Arequipa Hoy - {{ "now"|date:"d/m/Y H:i" }}
+    </div>
+</body>
+</html>
