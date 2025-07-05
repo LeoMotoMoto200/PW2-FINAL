@@ -5,7 +5,7 @@ class Evento(models.Model):
     descripción= models.TextField(max_length=200)
     fecha= models.DateField()
     hora= models.TimeField()
-    imagen = models.ImageField()
+    imagen = models.ImageField(upload_to='eventos/', default='eventos/default.jpg')
 
     def __str__(self):
             return self.titulo
