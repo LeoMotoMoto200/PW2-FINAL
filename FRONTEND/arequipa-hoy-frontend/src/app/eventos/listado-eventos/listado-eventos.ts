@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common'; // Necesario para *ngFor
 import { RouterModule } from '@angular/router'; // Necesario para routerLink
 import { Eventos } from '../eventos';
 
+
 @Component({
   selector: 'app-listado-eventos',
   standalone: true, // Esto indica que el componente gestiona sus propias dependencias

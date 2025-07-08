@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Eventos } from '../eventos';
 
+
 @Component({
   selector: 'app-detalle-evento',
   imports: [],
