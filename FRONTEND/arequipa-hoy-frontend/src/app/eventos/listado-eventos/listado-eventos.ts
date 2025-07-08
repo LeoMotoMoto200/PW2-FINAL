@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Necesario para *ngFor
 import { RouterModule } from '@angular/router'; // Necesario para routerLink
-import { EventosService } from '../eventos.service';
+import { Eventos } from '../eventos';
 
 @Component({
   selector: 'app-listado-eventos',
@@ -31,7 +31,7 @@ export class ListadoEventos implements OnInit{
     }
   ];
 
-  constructor(private eventosService: EventosService) {}
+  constructor(private eventosService: Eventos) {}
 
   ngOnInit(): void {
     this.eventosService.getEventos().subscribe(data => {
