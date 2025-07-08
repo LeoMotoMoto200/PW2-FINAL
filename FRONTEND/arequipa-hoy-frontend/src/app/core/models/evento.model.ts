@@ -1,12 +1,27 @@
+// En src/app/core/models/evento.model.ts (o en un nuevo archivo api-response.model.ts)
+export interface PaginatedResponse<T> {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: T[];
+  }
 // src/app/core/models/evento.model.ts
 export interface Evento {
     id: number;
-    nombre: string;
+    titulo: string; // <-- CORREGIDO: de 'nombre' a 'titulo'
     descripcion: string;
-    fecha_inicio: string; // Django envía las fechas como strings en formato ISO
-    fecha_fin: string;
-    lugar: string;
-    categoria: string; // Asumiendo que por ahora es un string simple
-    organizador: string;
-    imagen_url?: string; // Opcional por si no todos los eventos tienen imagen
+    fecha: string;      // <-- CORREGIDO: El backend envía 'fecha' y 'hora'
+    hora: string;
+    lugar: any;         // Pongo 'any' porque parece ser un objeto anidado
+    categoria: any;     // Igual aquí
+    organizador: any;
+    imagen: string | null; // <-- El backend envía 'imagen'
+  }
+
+// Interfaz para la respuesta paginada
+export interface PaginatedResponse<T> {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: T[];
   }

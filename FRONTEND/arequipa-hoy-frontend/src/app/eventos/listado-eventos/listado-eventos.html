@@ -1,19 +1,50 @@
+<!-- src/app/eventos/listado-eventos/listado-eventos.component.html -->
 <div class="container mt-4">
-  <div class="row">
-    <!-- Usamos *ngFor para recorrer el array 'eventos' del archivo .ts -->
-    <!-- Por cada 'evento' en el array, creará toda esta estructura de tarjeta -->
-    <div class="col-md-4 mb-4" *ngFor="let evento of eventos">
-      <div class="card h-100">
-        <!-- [src] es un enlace de propiedad: bindea la URL del evento a la imagen -->
-        <img [src]="evento.imagen" class="card-img-top" alt="Imagen del evento {{ evento.titulo }}">
+  <h2 class="mb-4">Próximos Eventos en Arequipa</h2>
+
+  <!-- Mensaje de error si la carga falla -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Mensaje de carga mientras esperamos la respuesta de la API -->
+  <div *ngIf="!error && eventos.length === 0" class="text-center mt-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando eventos...</p>
+  </div>
+
+  <!-- Contenedor de la lista de eventos, se muestra solo si hay eventos -->
+  <div *ngIf="eventos.length > 0" class="row">
+    <!-- Iteramos sobre la lista de eventos -->
+    <div *ngFor="let evento of eventos" class="col-lg-4 col-md-6 mb-4">
+      <div class="card h-100 shadow-sm">
+        
+        <!-- Imagen del evento. Muestra una imagen por defecto si no hay una. -->
+        <img [src]="evento.imagen || 'https://via.placeholder.com/400x200.png?text=Arequipa+Hoy'" class="card-img-top" alt="Imagen de {{ evento.titulo }}">
+        
         <div class="card-body d-flex flex-column">
-          <!-- {{ }} es interpolación: muestra el valor de la propiedad -->
+          <!-- Título del evento -->
           <h5 class="card-title">{{ evento.titulo }}</h5>
-          <p class="card-text"><strong>Fecha:</strong> {{ evento.fecha }}</p>
-          <p class="card-text"><strong>Lugar:</strong> {{ evento.lugar }}</p>
-          <!-- [routerLink] crea un enlace de navegación dentro de Angular -->
-          <!-- Esto generará una URL como /eventos/evento/1, /eventos/evento/2, etc. -->
-          <a [routerLink]="['/eventos/evento', evento.id]" class="btn btn-primary mt-auto">Ver más</a>
+          
+          <!-- Lugar del evento. Usamos encadenamiento opcional (?) por seguridad. -->
+          <h6 class="card-subtitle mb-2 text-muted">
+            📍 {{ evento.lugar?.nombre || 'Lugar no especificado' }}
+          </h6>
+          
+          <!-- Descripción acortada -->
+          <p class="card-text flex-grow-1">{{ evento.descripcion | slice:0:100 }}...</p>
+        </div>
+        
+        <div class="card-footer bg-white border-top-0">
+          <!-- Fecha del evento, usando el campo 'fecha' de la API -->
+          <small class="text-muted">
+            🗓️ {{ evento.fecha | date:'dd/MM/yyyy' }}
+          </small>
+          
+          <!-- Botón para navegar a la vista de detalle -->
+          <a [routerLink]="['/eventos', evento.id]" class="btn btn-primary btn-sm float-end">Ver detalles</a>
         </div>
       </div>
     </div>

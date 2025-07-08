@@ -1,44 +1,33 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Eventos } from '../eventos';
+import { EventosService } from '../../core/services/eventos.service';
+import { Evento } from '../../core/models/evento.model';
+import { CommonModule } from '@angular/common';
 
 
 @Component({
   selector: 'app-detalle-evento',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './detalle-evento.html',
   styleUrl: './detalle-evento.css'
 })
 export class DetalleEvento implements OnInit{
-  evento = {
-    id: 1,
-    titulo: 'Concierto Sinfónico',
-    descripcion: 'Una presentación inolvidable con orquesta completa.',
-    fecha: '2025-07-12',
-    hora: '19:00',
-    lugar: 'Teatro Municipal',
-    imagen: 'https://via.placeholder.com/600x300',
-    categoria: 'Cultural',
-  };
+  evento: Evento | null = null;
+  error: string | null = null;
+
   constructor(
     private route: ActivatedRoute,
-    private eventosService: Eventos
-  ) {}
+    private eventosService: EventosService
+  ) { }
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.eventosService.getEvento(id).subscribe(data => {
-      this.evento = data;
-    });
-  }
-
-  descargarPDF(): void {
-    const id = this.evento.id;
-    this.eventosService.descargarPDF(id).subscribe(blob => {
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `evento_${id}.pdf`;
-      link.click();
-    });
+    const id = this.route.snapshot.paramMap.get('id'); // Obtiene el 'id' de la URL
+    if (id) {
+      this.eventosService.getEventoById(+id).subscribe({ // el '+' convierte el string a número
+        next: (data) => this.evento = data,
+        error: (err) => this.error = "No se pudo encontrar el evento."
+      });
+    }
   }
 }

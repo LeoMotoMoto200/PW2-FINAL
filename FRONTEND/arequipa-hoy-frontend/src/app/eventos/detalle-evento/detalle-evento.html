@@ -1,12 +1,33 @@
-<div class="container mt-4">
-    <h2>{{ evento.titulo }}</h2>
-    <img [src]="evento.imagen" class="img-fluid mb-3">
-    <p><strong>Fecha:</strong> {{ evento.fecha }} - {{ evento.hora }}</p>
-    <p><strong>Lugar:</strong> {{ evento.lugar }}</p>
-    <p><strong>Categoría:</strong> {{ evento.categoria }}</p>
-    <p>{{ evento.descripcion }}</p>
-  </div>
+<!-- src/app/eventos/detalle-evento/detalle-evento.html -->
 
-  <button class="btn btn-outline-danger mt-3" (click)="descargarPDF()">
-    Descargar PDF
-  </button>
+<!-- Mensaje de carga mientras esperamos los datos -->
+<div *ngIf="!evento && !error" class="text-center mt-5">
+  <p>Cargando detalles del evento...</p>
+</div>
+
+<!-- Mensaje de error si la carga falla -->
+<div *ngIf="error" class="alert alert-danger mt-4">
+  {{ error }}
+</div>
+
+<!-- Contenedor principal que solo se muestra si 'evento' tiene datos -->
+<div *ngIf="evento" class="container mt-4">
+  
+  <h2>{{ evento.titulo }}</h2>
+
+  <!-- 
+    NOTA: El campo 'imagen' no existe en tu modelo de Django. 
+    Cuando lo agregues, puedes descomentar esta línea.
+    <img [src]="evento.imagen" class="img-fluid mb-3" alt="Imagen del evento {{ evento.nombre }}"> 
+  -->
+  
+  <p><strong>Fecha y Hora de Inicio:</strong> {{ evento.fecha | date:'fullDate' }} a las {{ evento.fecha | date:'shortTime' }}</p>
+  <p><strong>Lugar:</strong> {{ evento.lugar }}</p>
+  <p><strong>Categoría:</strong> {{ evento.categoria }}</p>
+  
+  <hr>
+
+  <h4>Descripción</h4>
+  <p>{{ evento.descripcion }}</p>
+
+</div>
