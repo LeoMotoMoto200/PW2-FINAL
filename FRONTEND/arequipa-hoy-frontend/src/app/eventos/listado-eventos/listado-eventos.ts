@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Necesario para *ngFor
 import { RouterModule } from '@angular/router'; // Necesario para routerLink
+import { EventosService } from '../eventos.service';
 
 @Component({
   selector: 'app-listado-eventos',
@@ -9,8 +10,7 @@ import { RouterModule } from '@angular/router'; // Necesario para routerLink
   templateUrl: './listado-eventos.html', // Corregí el nombre para seguir la convención
   styleUrl: './listado-eventos.css'
 })
-export class ListadoEventos {
-
+export class ListadoEventos implements OnInit{
   // Aquí creamos la lista de eventos simulados tal como dice la guía
   eventos = [
     {
@@ -30,5 +30,13 @@ export class ListadoEventos {
       lugar: 'Av. Independencia',
     }
   ];
+
+  constructor(private eventosService: EventosService) {}
+
+  ngOnInit(): void {
+    this.eventosService.getEventos().subscribe(data => {
+      this.eventos = data;
+    });
+  }
 
 }
