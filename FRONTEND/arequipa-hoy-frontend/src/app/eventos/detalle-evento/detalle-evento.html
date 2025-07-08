@@ -1,33 +1,63 @@
 <!-- src/app/eventos/detalle-evento/detalle-evento.html -->
 
-<!-- Mensaje de carga mientras esperamos los datos -->
-<div *ngIf="!evento && !error" class="text-center mt-5">
-  <p>Cargando detalles del evento...</p>
+<!-- Usamos *ngIf con 'async' para desenvolver el observable en la variable 'evento' -->
+<div *ngIf="evento$ | async as evento; else loadingOrErrorTemplate">
+
+  <!-- Este bloque solo se renderiza si 'evento' tiene datos (no es nulo) -->
+  <div *ngIf="evento" class="container mt-4">
+    <h2 class="mb-3">{{ evento.titulo }}</h2>
+    
+    <div class="row">
+      <div class="col-md-8">
+        <img [src]="evento.imagen || 'https://via.placeholder.com/800x400.png?text=Arequipa+Hoy'" class="img-fluid rounded shadow-sm mb-4" alt="Imagen de {{ evento.titulo }}">
+        
+        <h4>Descripción del Evento</h4>
+        <p>{{ evento.descripcion }}</p>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <strong>Detalles del Evento</strong>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Fecha:</strong> {{ evento.fecha | date:'fullDate' }}</li>
+            <li class="list-group-item"><strong>Hora:</strong> {{ evento.hora }}</li>
+            <li class="list-group-item"><strong>Lugar:</strong> {{ evento.lugar?.nombre || 'No especificado' }}</li>
+            <li class="list-group-item"><strong>Dirección:</strong> {{ evento.lugar?.direccion || 'No especificada' }}</li>
+            <li class="list-group-item"><strong>Categoría:</strong> {{ evento.categoria?.nombre || 'No especificada' }}</li>
+            <li class="list-group-item"><strong>Organiza:</strong> {{ evento.organizador?.nombre || 'No especificado' }}</li>
+          </ul>
+        </div>
+        
+        <a *ngIf="evento.lugar?.mapa_url" [href]="evento.lugar.mapa_url" target="_blank" class="btn btn-info w-100 mt-3">
+          Ver en Mapa
+        </a>
+
+        <a routerLink="/eventos" class="btn btn-secondary w-100 mt-2">
+          ← Volver al listado
+        </a>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<!-- Mensaje de error si la carga falla -->
-<div *ngIf="error" class="alert alert-danger mt-4">
-  {{ error }}
-</div>
-
-<!-- Contenedor principal que solo se muestra si 'evento' tiene datos -->
-<div *ngIf="evento" class="container mt-4">
+<!-- Plantilla que se muestra durante la carga o si hay un error -->
+<ng-template #loadingOrErrorTemplate>
+  <!-- Si la variable 'error' tiene un mensaje, lo mostramos -->
+  <div *ngIf="error" class="container mt-4 alert alert-danger">
+    {{ error }}
+    <div class="mt-3">
+      <a routerLink="/eventos" class="btn btn-secondary">Volver al listado</a>
+    </div>
+  </div>
   
-  <h2>{{ evento.titulo }}</h2>
-
-  <!-- 
-    NOTA: El campo 'imagen' no existe en tu modelo de Django. 
-    Cuando lo agregues, puedes descomentar esta línea.
-    <img [src]="evento.imagen" class="img-fluid mb-3" alt="Imagen del evento {{ evento.nombre }}"> 
-  -->
-  
-  <p><strong>Fecha y Hora de Inicio:</strong> {{ evento.fecha | date:'fullDate' }} a las {{ evento.fecha | date:'shortTime' }}</p>
-  <p><strong>Lugar:</strong> {{ evento.lugar }}</p>
-  <p><strong>Categoría:</strong> {{ evento.categoria }}</p>
-  
-  <hr>
-
-  <h4>Descripción</h4>
-  <p>{{ evento.descripcion }}</p>
-
-</div>
+  <!-- Si no hay error, mostramos el spinner de carga -->
+  <div *ngIf="!error" class="text-center mt-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando detalles del evento...</p>
+  </div>
+</ng-template>
