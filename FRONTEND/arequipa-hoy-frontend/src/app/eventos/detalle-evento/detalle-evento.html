@@ -29,6 +29,10 @@
             <li class="list-group-item"><strong>Organiza:</strong> {{ evento.organizador?.nombre || 'No especificado' }}</li>
           </ul>
         </div>
+
+        <a [href]="'http://127.0.0.1:8000/api/eventos/' + evento.id + '/pdf/'" target="_blank" class="btn btn-danger w-100 mt-3">
+          <i class="bi bi-file-earmark-pdf-fill"></i> Descargar Ficha (PDF)
+        </a>
         
         <a *ngIf="evento.lugar?.mapa_url" [href]="evento.lugar.mapa_url" target="_blank" class="btn btn-info w-100 mt-3">
           Ver en Mapa
