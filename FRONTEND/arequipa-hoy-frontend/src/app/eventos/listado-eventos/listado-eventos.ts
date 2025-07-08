@@ -1,42 +1,36 @@
+// src/app/eventos/listado-eventos/listado-eventos.component.ts
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Necesario para *ngFor
-import { RouterModule } from '@angular/router'; // Necesario para routerLink
-import { EventosService } from '../../core/services/eventos.service'; // <-- Ruta actualizada
-import { Evento } from '../../core/models/evento.model';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Observable, of } from 'rxjs'; // Importar Observable y of
+import { catchError } from 'rxjs/operators'; // Importar catchError
 
+import { EventosService } from '../../core/services/eventos.service';
+import { Evento } from '../../core/models/evento.model';
 
 @Component({
   selector: 'app-listado-eventos',
-  standalone: true, // Esto indica que el componente gestiona sus propias dependencias
-  imports: [CommonModule, RouterModule, RouterLink], // Importamos los módulos aquí
-  templateUrl: './listado-eventos.html', // Corregí el nombre para seguir la convención
-  styleUrl: './listado-eventos.css'
+  standalone: true,
+  imports: [CommonModule, RouterLink],
+  templateUrl: './listado-eventos.html',
+  styleUrls: ['./listado-eventos.css']
 })
-export class ListadoEventos implements OnInit{
-  // Aquí creamos la lista de eventos simulados tal como dice la guía
-  eventos: Evento[] = []; // Variable para guardar la lista de eventos
-  error: string | null = null; // Variable para manejar errores
+export class ListadoEventos implements OnInit {
 
-  // Inyectamos el servicio en el constructor
+  // En lugar de un array, declaramos un Observable de un array de eventos
+  public eventos$!: Observable<Evento[]>;
+  public error: string | null = null;
+
   constructor(private eventosService: EventosService) { }
 
-  // ngOnInit se ejecuta una vez que el componente se ha inicializado
   ngOnInit(): void {
-    this.cargarEventos();
-  }
-
-  cargarEventos(): void {
-    this.eventosService.getEventos().subscribe({
-      next: (data) => {
-        this.eventos = data;
-        console.log('Eventos cargados:', this.eventos); // Para depurar en la consola
-      },
-      error: (err) => {
+    this.eventos$ = this.eventosService.getEventos().pipe(
+      catchError(err => {
         console.error('Error al cargar eventos:', err);
-        this.error = 'No se pudieron cargar los eventos. ¿El servidor de Django está funcionando?';
-      }
-    });
+        this.error = 'No se pudieron cargar los eventos. Por favor, revisa la conexión con el servidor.';
+        // Devolvemos un observable con un array vacío para que el pipe async no falle
+        return of([]); 
+      })
+    );
   }
-
 }
