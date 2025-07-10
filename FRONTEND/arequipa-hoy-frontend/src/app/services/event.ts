@@ -8,7 +8,7 @@ import { AuthService } from './auth.service';
 })
 export class EventService {
   // La URL para el CRUD de eventos.
-  private apiUrl = 'http://127.0.0.1:8000/api/events/';
+  private apiUrl = 'http://127.0.0.1:8000/api/eventos/';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 

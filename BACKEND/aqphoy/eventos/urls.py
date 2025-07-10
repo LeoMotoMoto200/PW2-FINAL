@@ -1,14 +1,15 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import EventoViewSet, EventoPDFView, RegisterView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from .views import EventoViewSet, RegisterView, EventoPDFView, CategoriaViewSet
 
 router = DefaultRouter()
 router.register(r'eventos', EventoViewSet, basename='evento')
+router.register(r'categorias', CategoriaViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -17,5 +18,4 @@ urlpatterns = [
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'), # Esta es tu URL de LOGIN
     path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('', include(router.urls)),
-    path('api/', include('events.urls')),
 ]

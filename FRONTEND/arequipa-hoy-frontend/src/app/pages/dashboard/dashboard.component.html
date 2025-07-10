@@ -1,43 +1,59 @@
+<!-- frontend/src/app/dashboard/dashboard.component.html (CORREGIDO) -->
+
 <div class="container-fluid mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Dashboard del Organizador</h2>
   </div>
   
-  <!-- Formulario para Añadir/Editar Eventos -->
   <div class="card mb-4 shadow-sm">
     <div class="card-header">
-      <!-- El título del formulario cambia dinámicamente -->
       <h4 *ngIf="!editMode">Añadir Nuevo Evento</h4>
-      <h4 *ngIf="editMode">Editar Evento: {{ eventModel.title }}</h4>
+      <h4 *ngIf="editMode">Editar Evento: {{ eventModel.titulo }}</h4>
     </div>
     <div class="card-body">
-      <!-- El formulario llama a onFormSubmit() al enviarse -->
       <form (ngSubmit)="onFormSubmit()">
-        <!-- Campo oculto para guardar el ID cuando editamos -->
         <input type="hidden" [(ngModel)]="eventModel.id" name="id">
         
+        <!-- --- CAMBIOS EN LOS BINDINGS --- -->
         <div class="mb-3">
-          <label for="title" class="form-label">Título del Evento</label>
-          <input id="title" type="text" class="form-control" [(ngModel)]="eventModel.title" name="title" required>
+          <label for="titulo" class="form-label">Título del Evento</label>
+          <input id="titulo" type="text" class="form-control" [(ngModel)]="eventModel.titulo" name="titulo" required>
         </div>
         <div class="mb-3">
-          <label for="description" class="form-label">Descripción</label>
-          <textarea id="description" class="form-control" [(ngModel)]="eventModel.description" name="description" required></textarea>
+          <label for="descripcion" class="form-label">Descripción</label>
+          <textarea id="descripcion" class="form-control" [(ngModel)]="eventModel.descripcion" name="descripcion" required></textarea>
         </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="fecha" class="form-label">Fecha</label>
+            <input id="fecha" type="date" class="form-control" [(ngModel)]="eventModel.fecha" name="fecha" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="hora" class="form-label">Hora</label>
+            <input id="hora" type="time" class="form-control" [(ngModel)]="eventModel.hora" name="hora" required>
+          </div>
+        </div>
+
+        <!-- --- CAMPO DE CATEGORÍA (NUEVO Y OBLIGATORIO) --- -->
         <div class="mb-3">
-          <label for="date" class="form-label">Fecha</label>
-          <input id="date" type="date" class="form-control" [(ngModel)]="eventModel.date" name="date" required>
+          <label for="categoria" class="form-label">Categoría</label>
+          <select class="form-select" id="categoria" [(ngModel)]="eventModel.categoria_id" name="categoria_id" required>
+            <option [ngValue]="null" disabled>-- Selecciona una categoría --</option>
+            <option *ngFor="let cat of categorias" [value]="cat.id">
+              {{ cat.nombre }}
+            </option>
+          </select>
         </div>
         
-        <!-- Los botones también cambian dinámicamente -->
-        <button type="submit" class="btn btn-primary" *ngIf="!editMode">Guardar Evento</button>
-        <button type="submit" class="btn btn-info" *ngIf="editMode">Actualizar Evento</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!eventModel.titulo || !eventModel.categoria_id">
+          {{ editMode ? 'Actualizar Evento' : 'Guardar Evento' }}
+        </button>
         <button type="button" class="btn btn-secondary ms-2" *ngIf="editMode" (click)="cancelEdit()">Cancelar</button>
       </form>
     </div>
   </div>
 
-  <!-- Lista de Eventos -->
+  <!-- Lista de Eventos (la tuya ya está bien, solo cambia 'event.title' por 'event.titulo') -->
   <h3>Mis Eventos</h3>
   <div class="table-responsive">
     <table class="table table-striped table-hover">
@@ -49,26 +65,23 @@
         </tr>
       </thead>
       <tbody>
-        <!-- SPINNER DE CARGA -->
-        <tr *ngIf="isLoading">
+        <tr *ngIf="isLoading"> <!-- Esto ya está perfecto -->
           <td colspan="3" class="text-center py-5">
             <div class="spinner-border text-primary" role="status"></div>
             <p class="mt-2">Cargando eventos...</p>
           </td>
         </tr>
         
-        <!-- LISTA DE EVENTOS (se muestra cuando isLoading es false) -->
         <tr *ngFor="let event of events">
-          <td>{{ event.title }}</td>
-          <td>{{ event.date | date: 'dd/MM/yyyy' }}</td> <!-- Usamos el pipe para formatear la fecha -->
+          <td>{{ event.titulo }}</td> <!-- Cambiar de title a titulo -->
+          <td>{{ event.fecha | date: 'dd/MM/yyyy' }}</td>
           <td class="text-end">
             <button class="btn btn-sm btn-warning me-2" (click)="editEvent(event)">Editar</button>
             <button class="btn btn-sm btn-danger" (click)="deleteEvent(event.id)">Eliminar</button>
           </td>
         </tr>
 
-        <!-- MENSAJE SI NO HAY EVENTOS -->
-        <tr *ngIf="events.length === 0 && !isLoading">
+        <tr *ngIf="events.length === 0 && !isLoading"> <!-- Esto ya está perfecto -->
           <td colspan="3" class="text-center py-4">No has creado ningún evento todavía. ¡Anímate a crear el primero!</td>
         </tr>
       </tbody>
