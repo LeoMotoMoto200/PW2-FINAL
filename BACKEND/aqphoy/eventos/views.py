@@ -1,6 +1,7 @@
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, generics, permissions
 from .models import Evento
-from .serializers import EventoSerializer
+from .serializers import EventoSerializer, UserSerializer
+from django.contrib.auth.models import User
 
 from django.http import HttpResponse
 from django.views.generic import View
@@ -13,6 +14,10 @@ class EventoViewSet(viewsets.ModelViewSet):
     serializer_class = EventoSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['titulo', 'descripcion']
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [permissions.AllowAny] # Cualquiera se puede registrar
+    serializer_class = UserSerializer
 
 class EventoPDFView(View):
     def get(self, request, *args, **kwargs):

@@ -1,0 +1,32 @@
+<div class="p-5 mb-4 bg-light rounded-3">
+  <div class="container-fluid py-5">
+    <h1 class="display-5 fw-bold">Bienvenido a Arequipa Hoy</h1>
+    <p class="col-md-8 fs-4">La plataforma definitiva para descubrir y gestionar los mejores eventos de la Ciudad Blanca. Desde conciertos y festivales hasta ferias gastronómicas y talleres culturales.</p>
+    
+    <!-- Estos botones cambian según si el usuario está logueado o no -->
+    <ng-container *ngIf="!authService.isLoggedIn(); else loggedInButtons">
+      <a class="btn btn-primary btn-lg" routerLink="/register">Regístrate como Organizador</a>
+      <a class="btn btn-secondary btn-lg ms-2" routerLink="/login">Iniciar Sesión</a>
+    </ng-container>
+    
+    <ng-template #loggedInButtons>
+      <a class="btn btn-success btn-lg" routerLink="/dashboard">Ir a mi Dashboard</a>
+    </ng-template>
+
+  </div>
+</div>
+
+<div class="row align-items-md-stretch">
+  <div class="col-md-6">
+    <div class="h-100 p-5 text-white bg-dark rounded-3">
+      <h2>Para Organizadores</h2>
+      <p>Crea, edita y gestiona tus eventos de forma fácil y rápida. Llega a miles de personas interesadas en lo que ofreces.</p>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="h-100 p-5 bg-light border rounded-3">
+      <h2>Para Asistentes</h2>
+      <p>Encuentra los eventos que más te interesan. Filtra por categoría, fecha y no te pierdas nada de lo que sucede en Arequipa.</p>
+    </div>
+  </div>
+</div>

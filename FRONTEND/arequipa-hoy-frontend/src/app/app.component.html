@@ -1,0 +1,61 @@
+<!-- Barra de Navegación de Bootstrap -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+  <div class="container-fluid">
+    <!-- Logo/Título de la App que lleva a la Home -->
+    <a class="navbar-brand fw-bold" routerLink="/">
+      <i class="bi bi-calendar-event"></i> <!-- Un iconito de Bootstrap -->
+      Arequipa Hoy
+    </a>
+    
+    <!-- Botón para menú en móviles -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <!-- Links a la izquierda -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+        </li>
+        <!-- Este link solo aparece si el usuario está logueado -->
+        <li class="nav-item" *ngIf="authService.isLoggedIn()">
+          <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        </li>
+      </ul>
+      
+      <!-- Links a la derecha -->
+      <ul class="navbar-nav ms-auto">
+        <!-- Si el usuario NO está logueado, muestra Login y Register -->
+        <ng-container *ngIf="!authService.isLoggedIn()">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login" routerLinkActive="active">Iniciar Sesión</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-primary" routerLink="/register">Registrarse</a>
+          </li>
+        </ng-container>
+
+        <!-- Si el usuario SÍ está logueado, muestra el botón de Logout -->
+        <li class="nav-item" *ngIf="authService.isLoggedIn()">
+          <button class="btn btn-outline-light" (click)="logout()">
+            <i class="bi bi-box-arrow-right"></i> <!-- Otro iconito -->
+            Cerrar Sesión
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- El <router-outlet> es el espacio donde Angular cargará los componentes (Home, Login, Dashboard, etc.) -->
+<main class="container py-4">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- Un footer simple para que se vea más completo -->
+<footer class="footer mt-auto py-3 bg-light text-center">
+  <div class="container">
+    <span class="text-muted">Proyecto Final PW2 - Arequipa Hoy © {{ getYear() }}</span>
+  </div>
+</footer>

@@ -1,6 +1,25 @@
 
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from .models import Categoria, Organizador, Lugar, Evento
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'email', 'first_name', 'last_name']
+        extra_kwargs = {'password': {'write_only': True}} # Para que no devuelva el hash del password
+
+    def create(self, validated_data):
+        # Usamos create_user para que el password se guarde hasheado y no en texto plano
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', '')
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
