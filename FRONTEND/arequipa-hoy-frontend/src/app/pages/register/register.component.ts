@@ -12,7 +12,9 @@ import { CommonModule } from '@angular/common'; // Necesario para directivas (*n
   styleUrl: './register.component.css'
 })
 export class RegisterComponent {
-  model: any = {};
+  model: any = {
+    rol: 'normal'
+  };
   errorMessage: string = '';
 
   constructor(private authService: AuthService, private router: Router) { }

@@ -1,27 +1,27 @@
+// frontend/src/app/app.component.ts (CORREGIDO Y SIMPLIFICADO)
+
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router'; // Importamos RouterLink para usar routerLink en el HTML
-import { AuthService } from './services/auth.service'; // Importamos nuestro servicio de autenticación
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  // ¡Asegúrate de que RouterOutlet y RouterLink estén en los imports!
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
   title = 'Arequipa Hoy';
 
-  // Inyectamos el AuthService en el constructor para poder usarlo en la plantilla HTML.
-  // Lo declaramos como 'public' para que sea accesible desde el template.
+  // Hacemos el servicio público para que la plantilla HTML pueda acceder a sus métodos
+  // como `isLoggedIn()` y `isOrganizer()`.
   constructor(public authService: AuthService) {}
 
-  // Creamos una función de logout para llamarla desde el botón.
-  logout(): void {
-    this.authService.logout();
-  }
+  // El método logout() ya no es necesario aquí, lo llamaremos directamente
+  // desde el HTML para mantener el código más limpio.
+
   getYear(): number {
     return new Date().getFullYear();
   } 

@@ -10,6 +10,8 @@ from xhtml2pdf import pisa
 from .permissions import IsOwnerOrReadOnly
 from .models import Categoria  # Importa el modelo Categoria
 from .serializers import CategoriaSerializer # Importa el serializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import MyTokenObtainPairSerializer
 
 class EventoViewSet(viewsets.ModelViewSet):
     queryset = Evento.objects.all()
@@ -60,3 +62,6 @@ class CategoriaViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
     permission_classes = [permissions.AllowAny] # Cualquiera puede ver las categorías
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer

@@ -1,32 +1,29 @@
-<!-- Barra de Navegación de Bootstrap -->
+<!-- frontend/src/app/app.component.html (CORREGIDO) -->
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
   <div class="container-fluid">
-    <!-- Logo/Título de la App que lleva a la Home -->
     <a class="navbar-brand fw-bold" routerLink="/">
-      <i class="bi bi-calendar-event"></i> <!-- Un iconito de Bootstrap -->
+      <i class="bi bi-calendar-event"></i>
       Arequipa Hoy
     </a>
     
-    <!-- Botón para menú en móviles -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     
     <div class="collapse navbar-collapse" id="navbarNav">
-      <!-- Links a la izquierda -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
           <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
         </li>
-        <!-- Este link solo aparece si el usuario está logueado -->
-        <li class="nav-item" *ngIf="authService.isLoggedIn()">
-          <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        <!-- CAMBIO #1: Este enlace ahora solo aparece si el usuario es organizador -->
+        <li class="nav-item" *ngIf="authService.isOrganizer()">
+          <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Mi Dashboard</a>
         </li>
       </ul>
       
-      <!-- Links a la derecha -->
       <ul class="navbar-nav ms-auto">
-        <!-- Si el usuario NO está logueado, muestra Login y Register -->
+        <!-- Esto ya estaba bien: se muestra si NO está logueado -->
         <ng-container *ngIf="!authService.isLoggedIn()">
           <li class="nav-item">
             <a class="nav-link" routerLink="/login" routerLinkActive="active">Iniciar Sesión</a>
@@ -36,24 +33,35 @@
           </li>
         </ng-container>
 
-        <!-- Si el usuario SÍ está logueado, muestra el botón de Logout -->
-        <li class="nav-item" *ngIf="authService.isLoggedIn()">
-          <button class="btn btn-outline-light" (click)="logout()">
-            <i class="bi bi-box-arrow-right"></i> <!-- Otro iconito -->
-            Cerrar Sesión
-          </button>
+        <!-- CAMBIO #2: Menú desplegable para usuarios logueados, más profesional -->
+        <li class="nav-item dropdown" *ngIf="authService.isLoggedIn()">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <!-- Mostramos el nombre de usuario del token -->
+            Hola, {{ authService.currentUserValue?.username }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUserDropdown">
+            <!-- Si es organizador, le damos un atajo al dashboard -->
+            <li *ngIf="authService.isOrganizer()"><a class="dropdown-item" routerLink="/dashboard">Mi Dashboard</a></li>
+            <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <!-- El botón de logout ahora llama directamente al método del servicio -->
+              <button class="dropdown-item" (click)="authService.logout()">
+                <i class="bi bi-box-arrow-right"></i>
+                Cerrar Sesión
+              </button>
+            </li>
+          </ul>
         </li>
       </ul>
     </div>
   </div>
 </nav>
 
-<!-- El <router-outlet> es el espacio donde Angular cargará los componentes (Home, Login, Dashboard, etc.) -->
 <main class="container py-4">
   <router-outlet></router-outlet>
 </main>
 
-<!-- Un footer simple para que se vea más completo -->
 <footer class="footer mt-auto py-3 bg-light text-center">
   <div class="container">
     <span class="text-muted">Proyecto Final PW2 - Arequipa Hoy © {{ getYear() }}</span>

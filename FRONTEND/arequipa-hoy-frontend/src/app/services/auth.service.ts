@@ -1,78 +1,98 @@
-// --- IMPORTACIONES ---
-// Añadimos Inject y PLATFORM_ID para detectar el entorno.
+// frontend/src/app/services/auth.service.ts (CORREGIDO)
+
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common'; // Esta función es la clave.
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, BehaviorSubject, tap } from 'rxjs'; // 'tap' no se usaba en tu versión pero es útil
 import { Router } from '@angular/router';
+import { jwtDecode } from 'jwt-decode'; // Necesitas esta librería
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private apiUrl = 'http://127.0.0.1:8000/api';
-  // Esta variable guardará 'true' si estamos en un navegador, 'false' si estamos en el servidor.
   private isBrowser: boolean;
+
+  // --- CAMBIO #1: BEHAVIORSUBJECT PARA ESTADO REACTIVO ---
+  // Este objeto notificará a toda la app cuando el usuario cambie (login/logout).
+  private currentUserSubject = new BehaviorSubject<any>(this.getUserFromToken());
+  public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(
     private http: HttpClient, 
     private router: Router,
-    // --- CAMBIO #1: INYECTAR PLATFORM_ID ---
-    // Inyectamos el 'PLATFORM_ID' de Angular para saber dónde corre nuestro código.
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // --- CAMBIO #2: DETERMINAR EL ENTORNO ---
-    // Usamos la función isPlatformBrowser para saber si estamos en un navegador.
-    // Esto se ejecuta solo una vez, cuando el servicio se crea.
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
-  // --- La función de register no cambia, no usa localStorage ---
+  // Método privado para obtener los datos del usuario a partir del token en localStorage
+  private getUserFromToken(): any | null {
+    if (this.isBrowser) {
+      const token = this.getToken();
+      if (token) {
+        try {
+          return jwtDecode(token);
+        } catch (e) {
+          // Si el token es inválido, lo borramos
+          localStorage.removeItem('access_token');
+          return null;
+        }
+      }
+    }
+    return null;
+  }
+  
+  // --- CAMBIO #2: MÉTODO PÚBLICO PARA OBTENER EL VALOR ACTUAL DEL USUARIO ---
+  public get currentUserValue(): any {
+    return this.currentUserSubject.value;
+  }
+
   register(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register/`, userData);
   }
 
-  // --- La función de login ahora es más inteligente ---
+  // La función de login no necesita cambiar, ya que la lógica la maneja el componente
   login(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login/`, userData).pipe(
-      tap((response: any) => {
-        // --- CAMBIO #3: GUARDAR SOLO EN EL NAVEGADOR ---
-        // Antes de intentar guardar, preguntamos: ¿estamos en un navegador?
-        if (this.isBrowser) {
-          localStorage.setItem('access_token', response.access);
-          localStorage.setItem('refresh_token', response.refresh);
-        }
-      })
-    );
+    return this.http.post(`${this.apiUrl}/login/`, userData);
   }
 
-  // --- La función de logout ahora es más inteligente ---
+  // --- CAMBIO #3: SETTOKEN AHORA ACTUALIZA EL ESTADO ---
+  setToken(token: string): void {
+    if (this.isBrowser) {
+      localStorage.setItem('access_token', token);
+      // Notificamos a todos los suscriptores (como el navbar) que el usuario ha cambiado.
+      this.currentUserSubject.next(this.getUserFromToken());
+    }
+  }
+
+  // --- CAMBIO #4: LOGOUT AHORA ACTUALIZA EL ESTADO ---
   logout(): void {
-    // --- CAMBIO #4: BORRAR SOLO EN EL NAVEGADOR ---
     if (this.isBrowser) {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
     }
-    // La redirección sí la hacemos siempre.
+    // Notificamos que ya no hay usuario.
+    this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }
 
-  // --- La función de getToken ahora es más inteligente ---
   getToken(): string | null {
-    // --- CAMBIO #5: LEER SOLO EN EL NAVEGADOR ---
     if (this.isBrowser) {
       return localStorage.getItem('access_token');
     }
-    // Si estamos en el servidor, no puede haber token, devolvemos null.
     return null;
   }
-
-  // --- La función de isLoggedIn ahora es más inteligente ---
+  
+  // --- CAMBIO #5: ISLOGGEDIN AHORA USA EL ESTADO REACTIVO ---
   isLoggedIn(): boolean {
-    // --- CAMBIO #6: LA LÓGICA COMPLETA ---
-    // La doble negación (!!) convierte el resultado de getToken() en un booleano.
-    // Si estamos en el servidor, getToken() devuelve null, entonces !!null es false.
-    // Si estamos en el navegador, getToken() devuelve el token o null, y !! funciona como antes.
-    return !!this.getToken();
+    return !!this.currentUserValue;
+  }
+  
+  // --- CAMBIO #6: ¡EL NUEVO MÉTODO PARA VERIFICAR EL ROL! ---
+  isOrganizer(): boolean {
+    // Devuelve true solo si hay un usuario y su rol es 'organizer'
+    return this.isLoggedIn() && this.currentUserValue.rol === 'organizer';
   }
 }
