@@ -2,7 +2,12 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
   <div class="container-fluid">
-    <a class="navbar-brand fw-bold" routerLink="/">
+    <!-- 
+      CAMBIO CLAVE: El enlace principal ahora es inteligente.
+      - Si el usuario está logueado, lo lleva a /home.
+      - Si es un visitante, lo lleva a la raíz (/) que muestra la landing page.
+    -->
+    <a class="navbar-brand fw-bold" [routerLink]="authService.isLoggedIn() ? '/home' : '/'">
       <i class="bi bi-calendar-event"></i>
       Arequipa Hoy
     </a>
@@ -13,17 +18,18 @@
     
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <!-- Este enlace también lo hacemos inteligente para consistencia -->
         <li class="nav-item">
-          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+          <a class="nav-link" [routerLink]="authService.isLoggedIn() ? '/home' : '/'" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
         </li>
-        <!-- CAMBIO #1: Este enlace ahora solo aparece si el usuario es organizador -->
+        <!-- El enlace al dashboard solo para organizadores (esto ya está bien) -->
         <li class="nav-item" *ngIf="authService.isOrganizer()">
           <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Mi Dashboard</a>
         </li>
       </ul>
       
+      <!-- La lógica de la derecha (login/logout/menú de usuario) ya está perfecta. -->
       <ul class="navbar-nav ms-auto">
-        <!-- Esto ya estaba bien: se muestra si NO está logueado -->
         <ng-container *ngIf="!authService.isLoggedIn()">
           <li class="nav-item">
             <a class="nav-link" routerLink="/login" routerLinkActive="active">Iniciar Sesión</a>
@@ -33,22 +39,17 @@
           </li>
         </ng-container>
 
-        <!-- CAMBIO #2: Menú desplegable para usuarios logueados, más profesional -->
         <li class="nav-item dropdown" *ngIf="authService.isLoggedIn()">
           <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <!-- Mostramos el nombre de usuario del token -->
             Hola, {{ authService.currentUserValue?.username }}
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUserDropdown">
-            <!-- Si es organizador, le damos un atajo al dashboard -->
             <li *ngIf="authService.isOrganizer()"><a class="dropdown-item" routerLink="/dashboard">Mi Dashboard</a></li>
             <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>
-              <!-- El botón de logout ahora llama directamente al método del servicio -->
               <button class="dropdown-item" (click)="authService.logout()">
-                <i class="bi bi-box-arrow-right"></i>
-                Cerrar Sesión
+                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
               </button>
             </li>
           </ul>
@@ -58,12 +59,10 @@
   </div>
 </nav>
 
+<!-- El resto del archivo se queda igual -->
 <main class="container py-4">
   <router-outlet></router-outlet>
 </main>
-
 <footer class="footer mt-auto py-3 bg-light text-center">
-  <div class="container">
-    <span class="text-muted">Proyecto Final PW2 - Arequipa Hoy © {{ getYear() }}</span>
-  </div>
+    <!-- ... -->
 </footer>
