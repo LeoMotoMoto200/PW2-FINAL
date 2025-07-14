@@ -1,1 +1,32 @@
 /* You can add global styles to this file, and also import other style files */
+/* src/styles.css */
+
+/* Para que el footer se quede abajo en páginas con poco contenido */
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+}
+
+main.container {
+  flex: 1 0 auto; /* El contenido principal crece para empujar el footer hacia abajo */
+}
+
+/* Pequeños ajustes visuales */
+.btn {
+  transition: all 0.2s ease-in-out;
+}
+
+.card {
+  border: 0;
+  border-radius: 0.75rem;
+}

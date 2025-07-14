@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100, unique=True, verbose_name="Nombre")
@@ -44,6 +47,7 @@ class Evento(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True, related_name="eventos")
     organizador = models.ForeignKey(Organizador, on_delete=models.SET_NULL, null=True, blank=True, related_name="eventos")
     lugar = models.ForeignKey(Lugar, on_delete=models.SET_NULL, null=True, blank=True, related_name="eventos")
+    creador = models.ForeignKey(User, on_delete=models.CASCADE, related_name='eventos_creados')
 
     creado_en = models.DateTimeField(auto_now_add=True)
     actualizado_en = models.DateTimeField(auto_now=True)
@@ -55,3 +59,20 @@ class Evento(models.Model):
         verbose_name = "Evento"
         verbose_name_plural = "Eventos"
         ordering = ['-fecha', '-hora'] 
+
+class Profile(models.Model):
+    USER_ROLE_CHOICES = (
+        ('normal', 'Usuario Normal'),
+        ('organizer', 'Organizador'),
+    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    rol = models.CharField(max_length=10, choices=USER_ROLE_CHOICES, default='normal')
+
+    def __str__(self):
+        return f'{self.user.username} Profile'
+
+# Esta función crea un Profile automáticamente cada vez que se crea un User
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
