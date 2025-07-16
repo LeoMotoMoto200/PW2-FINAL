@@ -7,6 +7,8 @@ import { FormsModule } from '@angular/forms';
 // --- IMPORTACIONES NECESARIAS ---
 import { EventService } from '../../services/event'; // Renombra si tu servicio se llama así
 import { CategoriaService } from '../../services/categoria.service'; // Necesitarás este servicio
+import { LugarService } from '../../services/lugar.service'; // <-- NUEVO
+import { OrganizadorService } from '../../services/organizador.service'; // <-- NUEVO
 import { Categoria } from '../../core/models/categoria.model'; // Y el modelo correspondiente
 
 @Component({
@@ -25,24 +27,36 @@ export class DashboardComponent implements OnInit {
     descripcion: '',
     fecha: '',
     hora: '',
-    categoria_id: null // <-- Campo obligatorio
+    categoria_id: null,
+    lugar_id: null, // <-- NUEVO
+    organizador_id: null, // <-- Campo obligatorio
   };
-  
+  selectedImage: File | null = null;
   // Array para las categorías del <select>
   categorias: Categoria[] = [];
+  lugares: any[] = []; // <-- NUEVO
+  organizadores: any[] = [];
 
   editMode = false;
   isLoading = true;
 
   constructor(
     private eventService: EventService,
-    private categoriaService: CategoriaService, // <-- Inyectar el servicio de categorías
+    private categoriaService: CategoriaService,
+    private lugarService: LugarService, // <-- Inyectar
+    private organizadorService: OrganizadorService, // <-- Inyectar el servicio de categorías
     private datePipe: DatePipe
   ) { }
 
   ngOnInit(): void {
     this.loadEvents();
-    this.loadCategorias(); // <-- Cargar categorías al iniciar
+    this.loadInitialData(); // <-- Cargar categorías al iniciar
+  }
+
+  loadInitialData(): void {
+    this.categoriaService.getCategorias().subscribe(data => this.categorias = data.results || data);
+    this.lugarService.getLugares().subscribe(data => this.lugares = data.results || data);
+    this.organizadorService.getOrganizadores().subscribe(data => this.organizadores = data.results || data);
   }
 
   loadEvents(): void {
@@ -57,6 +71,54 @@ export class DashboardComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  onFileSelected(event: any): void {
+    if (event.target.files.length > 0) {
+      this.selectedImage = event.target.files[0];
+    }
+  }
+
+  onFormSubmit(): void {
+    // --- LÓGICA MEJORADA para manejar archivos ---
+    const formData = new FormData();
+    
+    // Añadimos todos los campos del modelo al FormData
+    // Object.keys itera sobre las propiedades de eventModel ('titulo', 'descripcion', etc.)
+    Object.keys(this.eventModel).forEach(key => {
+      if (this.eventModel[key] !== null && this.eventModel[key] !== '') {
+        formData.append(key, this.eventModel[key]);
+      }
+    });
+
+    // Si se seleccionó una imagen, la añadimos también
+    if (this.selectedImage) {
+      formData.append('imagen', this.selectedImage, this.selectedImage.name);
+    }
+    
+    if (this.editMode) {
+      // La actualización con archivos es más compleja (requiere PUT o PATCH),
+      // por ahora la dejamos con los datos de texto.
+      this.eventService.updateEvent(this.eventModel.id, this.eventModel).subscribe(() => {
+        this.loadEvents();
+        this.cancelEdit();
+      });
+    } else {
+      // Enviamos el objeto FormData en lugar de un JSON simple
+      this.eventService.addEvent(formData).subscribe(() => {
+        this.loadEvents();
+        this.resetForm();
+      });
+    }
+  }
+
+  editEvent(event: any): void {
+    this.editMode = true;
+    this.eventModel = { ...event }; 
+    // Aseguramos que los IDs de las relaciones se asignen correctamente
+    this.eventModel.categoria_id = event.categoria?.id; 
+    this.eventModel.lugar_id = event.lugar?.id;
+    this.eventModel.organizador_id = event.organizador?.id;
   }
 
   // --- NUEVA FUNCIÓN ---
@@ -77,49 +139,26 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  onFormSubmit(): void {
-    // --- CAMBIO #2: El datePipe ya no es necesario si el input es type="date"
-    // El formato 'yyyy-MM-dd' ya es el nativo.
-
-    // Creamos una copia para asegurarnos de enviar solo lo necesario.
-    const payload = { ...this.eventModel };
-
-    if (this.editMode) {
-      this.eventService.updateEvent(payload.id, payload).subscribe(() => {
-        this.loadEvents();
-        this.cancelEdit();
-      });
-    } else {
-      // Usamos el payload en lugar del this.eventModel directamente
-      this.eventService.addEvent(payload).subscribe(() => {
-        this.loadEvents();
-        this.resetForm();
-      });
-    }
-  }
-
-  editEvent(event: any): void {
-    this.editMode = true;
-    // Hacemos una copia para no modificar la lista directamente
-    this.eventModel = { ...event }; 
-    // Aseguramos que el ngModel del select funcione bien al editar
-    this.eventModel.categoria_id = event.categoria.id; 
-  }
 
   cancelEdit(): void {
     this.editMode = false;
     this.resetForm();
   }
   
-  // --- NUEVA FUNCIÓN HELPER ---
   resetForm(): void {
     this.eventModel = {
       titulo: '',
       descripcion: '',
       fecha: '',
       hora: '',
-      categoria_id: null
+      categoria_id: null,
+      lugar_id: null,
+      organizador_id: null,
     };
+    this.selectedImage = null;
+    // Resetea el input de archivo si lo tienes en un formulario
+    const fileInput = document.getElementById('imagen') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
   }
 
   deleteEvent(id: number): void {

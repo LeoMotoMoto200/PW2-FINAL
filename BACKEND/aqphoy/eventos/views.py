@@ -1,6 +1,6 @@
 from rest_framework import viewsets, filters, generics, permissions
 from .models import Evento
-from .serializers import EventoSerializer, UserSerializer
+from .serializers import EventoSerializer, UserSerializer, LugarSerializer, OrganizadorSerializer
 from django.contrib.auth.models import User
 
 from django.http import HttpResponse
@@ -8,7 +8,7 @@ from django.views.generic import View
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from .permissions import IsOwnerOrReadOnly
-from .models import Categoria  # Importa el modelo Categoria
+from .models import Categoria, Lugar, Organizador  # Importa el modelo Categoria
 from .serializers import CategoriaSerializer # Importa el serializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import MyTokenObtainPairSerializer
@@ -26,6 +26,16 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [permissions.AllowAny] # Cualquiera se puede registrar
     serializer_class = UserSerializer
+
+class LugarViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Lugar.objects.all()
+    serializer_class = LugarSerializer
+    permission_classes = [permissions.AllowAny]
+
+class OrganizadorViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Organizador.objects.all()
+    serializer_class = OrganizadorSerializer
+    permission_classes = [permissions.AllowAny]
 
 class EventoPDFView(View):
     def get(self, request, *args, **kwargs):

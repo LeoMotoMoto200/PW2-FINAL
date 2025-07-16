@@ -32,17 +32,35 @@
             <label for="hora" class="form-label">Hora</label>
             <input id="hora" type="time" class="form-control" [(ngModel)]="eventModel.hora" name="hora" required>
           </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+                <label for="categoria" class="form-label">Categoría</label>
+                <select class="form-select" id="categoria" [(ngModel)]="eventModel.categoria_id" name="categoria_id" required>
+                    <option [ngValue]="null" disabled>Selecciona...</option>
+                    <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.nombre }}</option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="lugar" class="form-label">Lugar</label>
+                <select class="form-select" id="lugar" [(ngModel)]="eventModel.lugar_id" name="lugar_id">
+                    <option [ngValue]="null">Selecciona...</option>
+                    <option *ngFor="let lug of lugares" [value]="lug.id">{{ lug.nombre }}</option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="organizador" class="form-label">Organizador</label>
+                <select class="form-select" id="organizador" [(ngModel)]="eventModel.organizador_id" name="organizador_id">
+                    <option [ngValue]="null">Selecciona...</option>
+                    <option *ngFor="let org of organizadores" [value]="org.id">{{ org.nombre }}</option>
+                </select>
+            </div>
         </div>
-
-        <!-- --- CAMPO DE CATEGORÍA (NUEVO Y OBLIGATORIO) --- -->
+    
         <div class="mb-3">
-          <label for="categoria" class="form-label">Categoría</label>
-          <select class="form-select" id="categoria" [(ngModel)]="eventModel.categoria_id" name="categoria_id" required>
-            <option [ngValue]="null" disabled>-- Selecciona una categoría --</option>
-            <option *ngFor="let cat of categorias" [value]="cat.id">
-              {{ cat.nombre }}
-            </option>
-          </select>
+            <label for="imagen" class="form-label">Imagen o Afiche del Evento</label>
+            <!-- (change) llama a onFileSelected cuando el usuario elige un archivo -->
+            <input class="form-control" type="file" id="imagen" (change)="onFileSelected($event)">
+        </div>
         </div>
         
         <button type="submit" class="btn btn-primary" [disabled]="!eventModel.titulo || !eventModel.categoria_id">
