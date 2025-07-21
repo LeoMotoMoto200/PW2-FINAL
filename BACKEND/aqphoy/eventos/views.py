@@ -79,3 +79,24 @@ class CategoriaViewSet(viewsets.ReadOnlyModelViewSet):
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+@api_view(['POST'])
+def enviar_correo(request):
+    asunto = request.data.get('asunto')
+    mensaje = request.data.get('mensaje')
+    destino = request.data.get('destinatario')
+
+    if not asunto or not mensaje or not destino:
+        return Response({'error': 'Faltan campos'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        send_mail(
+            subject=asunto,
+            message=mensaje,
+            from_email=None, # ----> usa EMAIL_HOST_USER del settings para enviar desde nuestro correo propio
+            recipient_list=[destino],
+            fail_silently=False
+        )
+        return Response({'mensaje': 'Correo enviado correctamente'})
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
