@@ -186,3 +186,10 @@ SIMPLE_JWT = {
     # Le decimos a simple-jwt que para obtener el token, DEBE usar nuestro serializer personalizado.
     "TOKEN_OBTAIN_SERIALIZER": "eventos.serializers.MyTokenObtainPairSerializer",
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'aqphoy.1@gmail.com'
+EMAIL_HOST_PASSWORD = 'ggou flvm pdvq dzys'

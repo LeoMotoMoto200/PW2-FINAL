@@ -2,6 +2,11 @@ from rest_framework import viewsets, filters, generics, permissions
 from .models import Evento
 from .serializers import EventoSerializer, UserSerializer, LugarSerializer, OrganizadorSerializer
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.conf import settings
 
 from django.http import HttpResponse
 from django.views.generic import View
@@ -75,3 +80,43 @@ class CategoriaViewSet(viewsets.ReadOnlyModelViewSet):
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+@api_view(['POST'])
+def enviar_correo(request, evento_id):
+    destino = request.data.get('destinatario')
+
+    if not destino:
+        return Response({'error': 'Falta el campo destinatario'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        evento = Evento.objects.get(pk=evento_id)
+    except Evento.DoesNotExist:
+        return Response({'error': 'Evento no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Construimos el correo con los detalles del evento
+    asunto = f"Detalles del evento: {evento.titulo}"
+    mensaje = f"""
+            Hola,
+
+            Aquí están los detalles del evento:
+
+            Título: {evento.titulo}
+            Descripción: {evento.descripcion}
+            Fecha: {evento.fecha}
+            Hora: {evento.hora}
+            Lugar: {evento.lugar}
+
+            ¡Esperamos verte allí!
+            """
+
+    try:
+        send_mail(
+            subject=asunto,
+            message=mensaje,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[destino],
+            fail_silently=False
+        )
+        return Response({'mensaje': f'Correo enviado con los detalles del evento {evento_id}.'})
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

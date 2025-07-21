@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router'; // <-- Añadir Rou
 import { CommonModule } from '@angular/common';
 import { Observable, of } from 'rxjs'; // <-- Importar Observable y of
 import { catchError, switchMap } from 'rxjs/operators'; // <-- Importar catchError y switchMap
+import { CorreoComponent } from '../../correo/correo.component'
 
 import { EventosService } from '../../core/services/eventos.service';
 import { Evento } from '../../core/models/evento.model';
@@ -12,7 +13,7 @@ import { Evento } from '../../core/models/evento.model';
   selector: 'app-detalle-evento',
   standalone: true,
   // Añadimos RouterLink para poder tener un botón de "Volver"
-  imports: [CommonModule, RouterLink], 
+  imports: [CommonModule, RouterLink, CorreoComponent], 
   templateUrl: './detalle-evento.html',
   styleUrls: ['./detalle-evento.css']
 })
