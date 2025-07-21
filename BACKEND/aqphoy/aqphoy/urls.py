@@ -6,7 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 # Importamos las vistas necesarias
-from eventos.views import MyTokenObtainPairView, RegisterView 
+from eventos.views import MyTokenObtainPairView, RegisterView, enviar_correo
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
@@ -17,6 +17,7 @@ urlpatterns = [
     path('api/login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/register/', RegisterView.as_view(), name='auth_register'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/eventos/<int:evento_id>/enviar-correo/', enviar_correo),
 
     # --- URLs ESPECÍFICAS DE LA APP EVENTOS ---
     # Esto incluye /api/eventos/, /api/categorias/, etc.
