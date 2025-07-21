@@ -2,6 +2,10 @@ from rest_framework import viewsets, filters, generics, permissions
 from .models import Evento
 from .serializers import EventoSerializer, UserSerializer, LugarSerializer, OrganizadorSerializer
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 
 from django.http import HttpResponse
 from django.views.generic import View
