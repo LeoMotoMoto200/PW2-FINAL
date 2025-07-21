@@ -1,1 +1,14 @@
-<p>correo works!</p>
+<div class="mt-4 border rounded p-3">
+  <h5>Enviar evento por correo</h5>
+
+  <div class="mb-2">
+    <label>Correo destinatario</label>
+    <input [(ngModel)]="destinatario" class="form-control" type="email" placeholder="ejemplo@email.com" />
+  </div>
+  
+  <button class="btn btn-primary w-100" (click)="enviarCorreo()">
+    <i class="bi bi-send-fill"></i> Enviar
+  </button>
+
+  <div *ngIf="respuesta" class="alert alert-info mt-3">{{ respuesta }}</div>
+</div>
