@@ -1,68 +1,81 @@
-<!-- src/app/eventos/detalle-evento/detalle-evento.html -->
-
 <!-- Usamos *ngIf con 'async' para desenvolver el observable en la variable 'evento' -->
 <div *ngIf="evento$ | async as evento; else loadingOrErrorTemplate">
 
   <!-- Este bloque solo se renderiza si 'evento' tiene datos (no es nulo) -->
-  <div *ngIf="evento" class="container mt-4">
-    <h2 class="mb-3">{{ evento.titulo }}</h2>
+  <div *ngIf="evento" class="container my-5">
+    <h1 class="mb-3 border-bottom pb-2">{{ evento.titulo }}</h1>
     
     <div class="row">
-      <div class="col-md-8">
+      <!-- Columna Izquierda: Imagen y Descripción -->
+      <div class="col-lg-8">
         <img [src]="evento.imagen || 'https://via.placeholder.com/800x400.png?text=Arequipa+Hoy'" class="img-fluid rounded shadow-sm mb-4" alt="Imagen de {{ evento.titulo }}">
         
-        <h4>Descripción del Evento</h4>
-        <p>{{ evento.descripcion }}</p>
+        <h4 class="mt-4">Descripción del Evento</h4>
+        <p class="lead">{{ evento.descripcion }}</p>
       </div>
       
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header">
-            <strong>Detalles del Evento</strong>
+      <!-- Columna Derecha: Detalles y Acciones -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="bi bi-info-circle-fill me-2"></i>Detalles del Evento</h5>
           </div>
           <ul class="list-group list-group-flush">
-            <li class="list-group-item"><strong>Fecha:</strong> {{ evento.fecha | date:'fullDate' }}</li>
-            <li class="list-group-item"><strong>Hora:</strong> {{ evento.hora }}</li>
-            <li class="list-group-item"><strong>Lugar:</strong> {{ evento.lugar?.nombre || 'No especificado' }}</li>
-            <li class="list-group-item"><strong>Dirección:</strong> {{ evento.lugar?.direccion || 'No especificada' }}</li>
-            <li class="list-group-item"><strong>Categoría:</strong> {{ evento.categoria?.nombre || 'No especificada' }}</li>
-            <li class="list-group-item"><strong>Organiza:</strong> {{ evento.organizador?.nombre || 'No especificado' }}</li>
+            <!-- ¡CORRECCIÓN! Usamos los campos `_info` que vienen del backend -->
+            <li class="list-group-item d-flex justify-content-between">
+              <strong><i class="bi bi-calendar-event me-2"></i>Fecha:</strong> 
+              <span>{{ evento.fecha | date:'fullDate' }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <strong><i class="bi bi-clock me-2"></i>Hora:</strong> 
+              <span>{{ evento.hora | slice:0:5 }} hrs</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <strong><i class="bi bi-geo-alt me-2"></i>Lugar:</strong> 
+              <span>{{ evento.lugar_info?.nombre || 'No especificado' }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <strong><i class="bi bi-signpost-split me-2"></i>Dirección:</strong> 
+              <span>{{ evento.lugar_info?.direccion || 'No especificada' }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <strong><i class="bi bi-tag me-2"></i>Categoría:</strong> 
+              <span *ngIf="evento.categoria_info" class="badge rounded-pill text-white" [style.backgroundColor]="evento.categoria_info.color">
+                {{ evento.categoria_info.nombre }}
+              </span>
+              <span *ngIf="!evento.categoria_info" class="text-muted">No especificada</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <strong><i class="bi bi-person-check me-2"></i>Organiza:</strong> 
+              <span>{{ evento.organizador_info?.nombre || 'No especificado' }}</span>
+            </li>
           </ul>
         </div>
 
-        <a [href]="'http://127.0.0.1:8000/api/eventos/' + evento.id + '/pdf/'" target="_blank" class="btn btn-danger w-100 mt-3">
-          <i class="bi bi-file-earmark-pdf-fill"></i> Descargar Ficha (PDF)
-        </a>
-        <app-correo [eventoId]="evento.id"></app-correo>
-        
-        <a *ngIf="evento.lugar?.mapa_url" [href]="evento.lugar.mapa_url" target="_blank" class="btn btn-info w-100 mt-3">
-          Ver en Mapa
-        </a>
+        <div class="d-grid gap-2 mt-3">
+          <a [href]="'http://127.0.0.1:8000/api/eventos/' + evento.id + '/pdf/'" target="_blank" class="btn btn-danger">
+            <i class="bi bi-file-earmark-pdf-fill me-2"></i>Descargar Ficha (PDF)
+          </a>
+          
+          <a *ngIf="evento.lugar_info?.mapa_url" [href]="evento.lugar_info?.mapa_url" target="_blank" class="btn btn-info">
+            <i class="bi bi-map-fill me-2"></i>Ver en Mapa
+          </a>
+        </div>
 
-        <a routerLink="/eventos" class="btn btn-secondary w-100 mt-2">
-          ← Volver al listado
-        </a>
+        <!-- Componente de Correo -->
+        <app-correo [eventoId]="evento.id" class="d-block mt-4"></app-correo>
+        
+        <div class="d-grid mt-4">
+          <a routerLink="/home" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle-fill me-2"></i>Volver al listado
+          </a>
+        </div>
       </div>
     </div>
   </div>
-
 </div>
 
-<!-- Plantilla que se muestra durante la carga o si hay un error -->
+<!-- Plantilla de Carga/Error (esta ya está bien) -->
 <ng-template #loadingOrErrorTemplate>
-  <!-- Si la variable 'error' tiene un mensaje, lo mostramos -->
-  <div *ngIf="error" class="container mt-4 alert alert-danger">
-    {{ error }}
-    <div class="mt-3">
-      <a routerLink="/eventos" class="btn btn-secondary">Volver al listado</a>
-    </div>
-  </div>
-  
-  <!-- Si no hay error, mostramos el spinner de carga -->
-  <div *ngIf="!error" class="text-center mt-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Cargando...</span>
-    </div>
-    <p class="mt-2">Cargando detalles del evento...</p>
-  </div>
+  <!-- ... -->
 </ng-template>

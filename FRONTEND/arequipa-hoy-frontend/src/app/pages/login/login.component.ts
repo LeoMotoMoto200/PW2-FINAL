@@ -1,61 +1,64 @@
-// frontend/src/app/pages/login/login.component.ts (CORREGIDO)
+// src/app/pages/login/login.component.ts
 
-import { Component, OnInit } from '@angular/core'; // Asegúrate de importar OnInit
-import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { jwtDecode } from 'jwt-decode';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router'; // Importa RouterModule para routerLink
+import { AuthService } from '../../services/auth.service';
+import { ToastrService } from 'ngx-toastr'; // Para notificaciones bonitas
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule], // Añade RouterModule
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit { // Asegúrate de implementar OnInit
+export class LoginComponent implements OnInit {
   model: any = {};
   errorMessage: string = '';
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    private toastr: ToastrService // Inyecta ToastrService
+  ) { }
 
-  // --- LÓGICA MEJORADA ---
   ngOnInit(): void {
-    // Si el usuario ya tiene una sesión válida, no debería estar en la página de login.
-    // Lo redirigimos a su página de inicio correspondiente.
+    // Esta lógica está perfecta. Si el usuario ya está logueado, lo saca de aquí.
     if (this.authService.isLoggedIn()) {
-      const user = this.authService.currentUserValue;
-      if (user && user.rol === 'organizer') {
+      if (this.authService.isOrganizer()) {
         this.router.navigate(['/dashboard']);
       } else {
-        this.router.navigate(['/home']);
+        this.router.navigate(['/']); // Redirige a la página principal
       }
     }
   }
 
-  // Tu método onSubmit ya funciona perfectamente y no necesita cambios.
+  // --- onSubmit SIMPLIFICADO ---
+  // Ahora confía en el AuthService para manejar el token y el estado.
   onSubmit() {
+    if (!this.model.username || !this.model.password) {
+      this.toastr.warning('Por favor, ingresa tu usuario y contraseña.', 'Campos incompletos');
+      return;
+    }
+
     this.authService.login(this.model).subscribe({
-      next: (response) => {
-        const accessToken = response.access;
-        if (accessToken) {
-          this.authService.setToken(accessToken);
-          try {
-            const decodedToken: any = jwtDecode(accessToken);
-            if (decodedToken.rol === 'organizer') {
-              this.router.navigate(['/dashboard']);
-            } else {
-              this.router.navigate(['/home']);
-            }
-          } catch (error) {
-            console.error('Error al decodificar el token:', error);
-            this.router.navigate(['/home']);
-          }
+      next: () => {
+        // El servicio ya guardó el token y actualizó el estado.
+        // Ahora solo leemos ese estado para decidir a dónde ir.
+        this.toastr.success(`¡Bienvenido, ${this.authService.currentUserValue.username}!`, 'Login Exitoso');
+
+        if (this.authService.isOrganizer()) {
+          this.router.navigate(['/dashboard']);
+        } else {
+          this.router.navigate(['/']); // O a la página que corresponda para usuarios normales
         }
       },
       error: (err) => {
-        this.errorMessage = 'Usuario o contraseña incorrectos.';
+        // El manejo de errores está bien.
+        this.toastr.error('Usuario o contraseña incorrectos.', 'Error de Autenticación');
+        this.errorMessage = 'No se pudo iniciar sesión. Verifica tus credenciales.';
         console.error('Error de login:', err);
       }
     });

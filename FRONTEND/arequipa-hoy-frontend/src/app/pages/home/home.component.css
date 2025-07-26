@@ -1,0 +1,26 @@
+.hero-section {
+  position: relative;
+  height: 60vh; /* Altura del banner, puedes ajustarlo (ej. 50vh, 400px) */
+  background-image: url('../../../assets/images/misti.jpg'); /* ¡LA RUTA A TU IMAGEN! */
+  background-size: cover;
+  background-position: center center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* Capa oscura para que el texto resalte */
+}
+
+.hero-content {
+  position: relative; /* Para que esté por encima de la capa oscura */
+  z-index: 2;
+}

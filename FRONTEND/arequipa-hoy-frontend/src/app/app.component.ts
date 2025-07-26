@@ -1,9 +1,7 @@
-// frontend/src/app/app.component.ts (CORREGIDO Y SIMPLIFICADO)
-
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from './services/auth.service';
+import { AuthService } from './services/auth.service'; // Asegúrate de que la ruta sea correcta
 
 @Component({
   selector: 'app-root',
@@ -14,15 +12,17 @@ import { AuthService } from './services/auth.service';
 })
 export class AppComponent {
   title = 'Arequipa Hoy';
-
-  // Hacemos el servicio público para que la plantilla HTML pueda acceder a sus métodos
-  // como `isLoggedIn()` y `isOrganizer()`.
+  
+  // Hacemos el servicio 'public' para poder usar 'authService.isLoggedIn()' en el HTML
   constructor(public authService: AuthService) {}
 
-  // El método logout() ya no es necesario aquí, lo llamaremos directamente
-  // desde el HTML para mantener el código más limpio.
-
+  // --- ¡AQUÍ ESTÁ LA FUNCIÓN QUE FALTABA! ---
+  logout(): void {
+    this.authService.logout();
+  }
+  
+  // También la función getYear para el footer
   getYear(): number {
     return new Date().getFullYear();
-  } 
+  }
 }

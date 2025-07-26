@@ -1,42 +1,46 @@
-// frontend/src/app/services/auth.service.ts (CORREGIDO)
+// src/app/services/auth.service.ts
 
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs'; // 'tap' no se usaba en tu versión pero es útil
+import { Observable, BehaviorSubject, of } from 'rxjs'; // Importamos 'of' para el logout
+import { tap } from 'rxjs/operators'; // El 'tap' va en 'rxjs/operators'
 import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode'; // Necesitas esta librería
+import { jwtDecode } from 'jwt-decode'; // Necesitarás instalar esta librería
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://127.0.0.1:8000/api';
+  private apiUrl = 'https://arequipa-hoy-backend.onrender.com/api/login/';
   private isBrowser: boolean;
 
-  // --- CAMBIO #1: BEHAVIORSUBJECT PARA ESTADO REACTIVO ---
-  // Este objeto notificará a toda la app cuando el usuario cambie (login/logout).
-  private currentUserSubject = new BehaviorSubject<any>(this.getUserFromToken());
-  public currentUser$ = this.currentUserSubject.asObservable();
+  // Tu BehaviorSubject está perfecto para notificar cambios en la autenticación.
+  private currentUserSubject: BehaviorSubject<any>;
+  public currentUser$: Observable<any>;
 
   constructor(
-    private http: HttpClient, 
+    private http: HttpClient,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
+    // Es crucial verificar si estamos en el navegador antes de tocar localStorage.
     this.isBrowser = isPlatformBrowser(this.platformId);
+    // Inicializamos el BehaviorSubject con los datos del token si existen.
+    this.currentUserSubject = new BehaviorSubject<any>(this.getUserFromToken());
+    this.currentUser$ = this.currentUserSubject.asObservable();
   }
 
-  // Método privado para obtener los datos del usuario a partir del token en localStorage
+  // Este método está perfecto.
   private getUserFromToken(): any | null {
     if (this.isBrowser) {
       const token = this.getToken();
       if (token) {
         try {
-          return jwtDecode(token);
+          return jwtDecode(token); // Decodifica el token para obtener el payload (username, rol, etc.)
         } catch (e) {
-          // Si el token es inválido, lo borramos
-          localStorage.removeItem('access_token');
+          console.error('Token inválido:', e);
+          this.clearLocalStorage();
           return null;
         }
       }
@@ -44,38 +48,50 @@ export class AuthService {
     return null;
   }
   
-  // --- CAMBIO #2: MÉTODO PÚBLICO PARA OBTENER EL VALOR ACTUAL DEL USUARIO ---
+  // Este método también está perfecto.
   public get currentUserValue(): any {
     return this.currentUserSubject.value;
   }
 
+  // La función de registro está bien.
   register(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register/`, userData);
   }
 
-  // La función de login no necesita cambiar, ya que la lógica la maneja el componente
+  // --- ¡AQUÍ ESTÁ EL CAMBIO MÁS IMPORTANTE! ---
   login(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login/`, userData);
+    return this.http.post<any>(`${this.apiUrl}/login/`, userData).pipe(
+      tap(response => {
+        // 'tap' nos permite "espiar" la respuesta sin alterarla.
+        // Aquí es donde guardamos los tokens y actualizamos el estado.
+        if (response && response.access && response.refresh) {
+          if (this.isBrowser) {
+            localStorage.setItem('access_token', response.access);
+            localStorage.setItem('refresh_token', response.refresh);
+            
+            // Notificamos a toda la app que un nuevo usuario ha iniciado sesión.
+            this.currentUserSubject.next(this.getUserFromToken());
+          }
+        }
+      })
+    );
   }
 
-  // --- CAMBIO #3: SETTOKEN AHORA ACTUALIZA EL ESTADO ---
-  setToken(token: string): void {
-    if (this.isBrowser) {
-      localStorage.setItem('access_token', token);
-      // Notificamos a todos los suscriptores (como el navbar) que el usuario ha cambiado.
-      this.currentUserSubject.next(this.getUserFromToken());
-    }
-  }
-
-  // --- CAMBIO #4: LOGOUT AHORA ACTUALIZA EL ESTADO ---
+  // --- LOGOUT MEJORADO ---
   logout(): void {
     if (this.isBrowser) {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
+      this.clearLocalStorage();
     }
-    // Notificamos que ya no hay usuario.
+    // Notificamos a la app que ya no hay usuario.
     this.currentUserSubject.next(null);
+    // Redirigimos al login.
     this.router.navigate(['/login']);
+  }
+
+  // Método de ayuda para no repetir código.
+  private clearLocalStorage(): void {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
   }
 
   getToken(): string | null {
@@ -85,14 +101,14 @@ export class AuthService {
     return null;
   }
   
-  // --- CAMBIO #5: ISLOGGEDIN AHORA USA EL ESTADO REACTIVO ---
+  // isLoggedIn ahora es más simple y robusto.
   isLoggedIn(): boolean {
+    // Si hay un valor en currentUserValue (no es null), el usuario está logueado.
     return !!this.currentUserValue;
   }
   
-  // --- CAMBIO #6: ¡EL NUEVO MÉTODO PARA VERIFICAR EL ROL! ---
+  // ¡Este método está perfecto para proteger rutas o mostrar/ocultar botones!
   isOrganizer(): boolean {
-    // Devuelve true solo si hay un usuario y su rol es 'organizer'
-    return this.isLoggedIn() && this.currentUserValue.rol === 'organizer';
+    return this.isLoggedIn() && this.currentUserValue?.rol === 'organizer';
   }
 }

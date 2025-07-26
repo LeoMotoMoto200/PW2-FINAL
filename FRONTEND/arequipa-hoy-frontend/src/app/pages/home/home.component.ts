@@ -1,47 +1,55 @@
-// frontend/src/app/pages/home/home.component.ts (CORREGIDO)
+// src/app/pages/home/home.component.ts (VERSIÓN FINAL)
 
-import { Component, OnInit } from '@angular/core'; // Importa OnInit
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { EventService } from '../../services/event.service'; // Importa PaginatedResponse
 
-// --- IMPORTACIONES NECESARIAS ---
-import { EventService } from '../../services/event'; // Asegúrate de la ruta a tu servicio de eventos
-import { Evento } from '../../core/models/evento.model'; // Importa tu modelo de Evento si lo tienes
+import { Evento, PaginatedResponse } from '../../core/models/evento.model';
+import { FiltroBusquedaComponent } from '../../eventos/filtro-busqueda/filtro-busqueda.component'; // ¡IMPORTANTE!
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FiltroBusquedaComponent], // ¡Añádelo aquí!
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit { // Implementa OnInit
+export class HomeComponent implements OnInit {
   
-  // --- NUEVAS PROPIEDADES ---
-  public eventos: Evento[] = []; // Array para guardar los eventos que llegan de la API
-  public isLoading = true; // Variable para mostrar un spinner de carga
+  public eventos: Evento[] = [];
+  public isLoading = true;
 
-  // Inyectamos el EventoService para poder usarlo
-  constructor(private eventoService: EventService) {}
+  constructor(
+    private eventoService: EventService, 
+    public authService: AuthService,
+    private toastr: ToastrService // Inyectamos para notificaciones
+  ) {}
 
-  // ngOnInit es un método que se ejecuta automáticamente cuando el componente se carga
   ngOnInit(): void {
-    this.loadEventos();
+    // Carga inicial sin filtros
+    this.loadEventos({});
   }
 
-  // --- NUEVA FUNCIÓN PARA CARGAR LOS EVENTOS ---
-  loadEventos(): void {
-    this.isLoading = true; // Mostramos el spinner
-    this.eventoService.getEvents().subscribe({
-      next: (data: any) => {
-        // Asignamos el array de 'results' que viene de la API paginada de Django
+  loadEventos(filtros: any): void {
+    this.isLoading = true;
+    this.eventoService.getEvents(filtros).subscribe({
+      next: (data: PaginatedResponse<Evento>) => { // Usamos el tipo Evento para más seguridad
         this.eventos = data.results; 
-        this.isLoading = false; // Ocultamos el spinner
+        this.isLoading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
+        this.toastr.error('No se pudieron cargar los eventos.', 'Error de Red');
         console.error('Error al cargar los eventos para el home:', err);
-        this.isLoading = false; // Ocultamos el spinner incluso si hay error
+        this.isLoading = false;
       }
     });
+  }
+
+  // Esta función recibe los filtros del componente hijo
+  onFiltrosCambiados(nuevosFiltros: any): void {
+    this.loadEventos(nuevosFiltros);
   }
 }
