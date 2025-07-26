@@ -1,3 +1,4 @@
+# eventos/models.py
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -13,6 +14,7 @@ class Categoria(models.Model):
     class Meta:
         verbose_name = "Categoría"
         verbose_name_plural = "Categorías"
+        ordering = ['nombre'] # Opcional: para que las categorías salgan ordenadas
 
 class Organizador(models.Model):
     nombre = models.CharField(max_length=200, verbose_name="Nombre del Organizador")
@@ -24,6 +26,7 @@ class Organizador(models.Model):
     class Meta:
         verbose_name = "Organizador"
         verbose_name_plural = "Organizadores"
+        ordering = ['nombre'] # Opcional: para que salgan ordenados
 
 class Lugar(models.Model):
     nombre = models.CharField(max_length=200, verbose_name="Nombre del Lugar")
@@ -36,6 +39,7 @@ class Lugar(models.Model):
     class Meta:
         verbose_name = "Lugar"
         verbose_name_plural = "Lugares"
+        ordering = ['nombre'] # Opcional: para que salgan ordenados
 
 class Evento(models.Model):
     titulo = models.CharField(max_length=200, verbose_name="Título del Evento")
@@ -44,11 +48,13 @@ class Evento(models.Model):
     hora = models.TimeField(verbose_name="Hora del Evento")
     imagen = models.ImageField(upload_to='eventos_imagenes/', blank=True, null=True, verbose_name="Imagen o Afiche")
     
+    # Relaciones con otros modelos
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True, related_name="eventos")
     organizador = models.ForeignKey(Organizador, on_delete=models.SET_NULL, null=True, blank=True, related_name="eventos")
     lugar = models.ForeignKey(Lugar, on_delete=models.SET_NULL, null=True, blank=True, related_name="eventos")
     creador = models.ForeignKey(User, on_delete=models.CASCADE, related_name='eventos_creados')
 
+    # Campos de auditoría
     creado_en = models.DateTimeField(auto_now_add=True)
     actualizado_en = models.DateTimeField(auto_now=True)
 
@@ -65,14 +71,18 @@ class Profile(models.Model):
         ('normal', 'Usuario Normal'),
         ('organizer', 'Organizador'),
     )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # --- CAMBIO SUGERIDO ---
+    # Añadimos related_name='profile' para poder hacer user.profile
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     rol = models.CharField(max_length=10, choices=USER_ROLE_CHOICES, default='normal')
 
     def __str__(self):
         return f'{self.user.username} Profile'
 
-# Esta función crea un Profile automáticamente cada vez que se crea un User
+# Esta función se asegura de que cada usuario tenga un perfil.
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
+    # Opcional: si quieres que se guarde el perfil cada vez que se guarda el usuario
+    # instance.profile.save()

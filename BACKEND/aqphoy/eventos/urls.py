@@ -1,20 +1,35 @@
-# backend/eventos/urls.py
+# eventos/urls.py
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import EventoViewSet, EventoPDFView, CategoriaViewSet, LugarViewSet, OrganizadorViewSet
+from .views import (
+    EventoViewSet, 
+    RegisterView,
+    MyTokenObtainPairView,
+    EventoPDFView, 
+    CategoriaViewSet, 
+    LugarViewSet, 
+    OrganizadorViewSet,
+    enviar_correo_evento
+)
 
+# Creamos un router para manejar automáticamente las URLs de los ViewSets.
 router = DefaultRouter()
-# Registra las rutas para /api/eventos/ y /api/categorias/
 router.register(r'eventos', EventoViewSet, basename='evento')
 router.register(r'categorias', CategoriaViewSet, basename='categoria')
 router.register(r'lugares', LugarViewSet, basename='lugar')
 router.register(r'organizadores', OrganizadorViewSet, basename='organizador')
 
+# Tu lista de URLs, ahora con todo centralizado y ordenado.
 urlpatterns = [
-    # Incluye las URLs generadas por el router
-    path('', include(router.urls)),
-    
-    # Mantenemos solo las URLs que son específicas de la app "eventos"
+    # --- RUTAS DE AUTENTICACIÓN ---
+    path('register/', RegisterView.as_view(), name='auth_register'),
+    path('login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+
+    # --- RUTAS DE FUNCIONALIDADES EXTRA (LAS TUYAS) ---
     path('eventos/<int:pk>/pdf/', EventoPDFView.as_view(), name='evento-pdf-detail'),
+    path('eventos/<int:evento_id>/enviar-correo/', enviar_correo_evento, name='enviar-correo-evento'),
+
+    # Incluimos todas las URLs del router (CRUDs) al final.
+    path('', include(router.urls)),
 ]

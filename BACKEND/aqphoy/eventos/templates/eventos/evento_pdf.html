@@ -2,10 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Detalle del Evento: {{ evento.titulo }}</title>
+    <title>Ficha del Evento: {{ evento.titulo }}</title>
     <style>
         @page {
             size: a4 portrait;
+            /* stylelint-disable-next-line at-rule-no-unknown */
             @frame content_frame {
                 left: 50pt;
                 width: 512pt;
@@ -15,58 +16,95 @@
         }
         body {
             font-family: "Helvetica", "Arial", sans-serif;
-            color: #333;
+            color: #333333;
+            font-size: 12px;
         }
         h1 {
-            color: #0056b3;
+            color: #2c3e50; /* Un azul oscuro más sobrio */
             text-align: center;
+            border-bottom: 2px solid #3498db; /* Un borde azul */
+            padding-bottom: 10px;
+            margin-bottom: 30px;
         }
         h2 {
-            color: #333;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 5px;
+            color: #34495e; /* Un gris azulado */
+            border-bottom: 1px solid #eeeeee;
+            padding-bottom: 8px;
+            margin-top: 25px;
         }
         .container {
             width: 100%;
         }
-        .info-block {
-            margin-bottom: 20px;
+        .info-block p {
+            margin: 8px 0;
+            line-height: 1.5;
         }
         .info-block strong {
             display: inline-block;
             width: 120px;
-            color: #555;
+            color: #555555;
+        }
+        .descripcion {
+            text-align: justify;
+        }
+        .evento-imagen {
+            max-width: 100%;
+            max-height: 300pt; 
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            object-fit: contain; /* <-- Para que la imagen no se deforme */
         }
         .footer {
             position: fixed;
-            bottom: 0;
+            bottom: -20pt; /* Ajuste para que se vea bien */
+            left: 50pt;
+            width: 512pt;
             text-align: center;
             font-size: 10px;
-            color: #777;
+            color: #777777;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>{{ evento.titulo }}</h1>
+
+        <!-- ¡MEJORA 1: AÑADIMOS LA IMAGEN DEL EVENTO! -->
+        {% if evento.imagen %}
+            <!-- Es crucial usar la URL absoluta para que el generador de PDF encuentre la imagen -->
+            <img src="http://127.0.0.1:8000{{ evento.imagen.url }}" class="evento-imagen">
+        {% endif %}
         
         <div class="info-block">
             <h2>Información General</h2>
-            <p><strong>Fecha:</strong> {{ evento.fecha|date:"d F, Y" }}</p>
-            <p><strong>Hora:</strong> {{ evento.hora|time:"H:i" }}</p>
-            <p><strong>Categoría:</strong> {{ evento.categoria.nombre|default:"No especificada" }}</p>
+            <p><strong>Fecha:</strong> {{ evento.fecha|date:"l, d F, Y" }}</p>
+            <p><strong>Hora:</strong> {{ evento.hora|time:"H:i" }} hrs</p>
+            <!-- ¡MEJORA 2: USAMOS IF PARA MÁS SEGURIDAD! -->
+            {% if evento.categoria %}
+                <p><strong>Categoría:</strong> {{ evento.categoria.nombre }}</p>
+            {% endif %}
         </div>
 
         <div class="info-block">
             <h2>Lugar y Organizador</h2>
-            <p><strong>Lugar:</strong> {{ evento.lugar.nombre|default:"No especificado" }}</p>
-            <p><strong>Dirección:</strong> {{ evento.lugar.direccion|default:"No especificada" }}</p>
-            <p><strong>Organizador:</strong> {{ evento.organizador.nombre|default:"No especificado" }}</p>
+            {% if evento.lugar %}
+                <p><strong>Lugar:</strong> {{ evento.lugar.nombre }}</p>
+                <p><strong>Dirección:</strong> {{ evento.lugar.direccion }}</p>
+            {% else %}
+                <p><strong>Lugar:</strong> No especificado</p>
+            {% endif %}
+
+            {% if evento.organizador %}
+                <p><strong>Organizador:</strong> {{ evento.organizador.nombre }}</p>
+            {% endif %}
         </div>
 
         <div class="info-block">
             <h2>Descripción del Evento</h2>
-            <p>{{ evento.descripcion|linebreaksbr }}</p>
+            <p class="descripcion">{{ evento.descripcion|linebreaksbr }}</p>
         </div>
     </div>
     

@@ -1,122 +1,150 @@
-from rest_framework import viewsets, filters, generics, permissions
-from .models import Evento
-from .serializers import EventoSerializer, UserSerializer, LugarSerializer, OrganizadorSerializer
+# eventos/views.py
+
+# --- Imports necesarios ---
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.template.loader import get_template
+from django.views.generic import View
 from django.core.mail import send_mail
+
+from rest_framework import viewsets, generics, permissions, status, filters
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
-from django.conf import settings
-
-from django.http import HttpResponse
-from django.views.generic import View
-from django.template.loader import get_template
-from xhtml2pdf import pisa
-from .permissions import IsOwnerOrReadOnly
-from .models import Categoria, Lugar, Organizador  # Importa el modelo Categoria
-from .serializers import CategoriaSerializer # Importa el serializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import MyTokenObtainPairSerializer
+from django_filters.rest_framework import DjangoFilterBackend
 
-class EventoViewSet(viewsets.ModelViewSet):
-    queryset = Evento.objects.all()
-    serializer_class = EventoSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['titulo', 'descripcion']
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-    def perform_create(self, serializer):
-        # Asigna automáticamente el usuario logueado como el creador
-        serializer.save(creador=self.request.user)
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    permission_classes = [permissions.AllowAny] # Cualquiera se puede registrar
-    serializer_class = UserSerializer
+from .models import Evento, Categoria, Lugar, Organizador
+from .serializers import (
+    EventoSerializer, UserSerializer, CategoriaSerializer, 
+    LugarSerializer, OrganizadorSerializer, MyTokenObtainPairSerializer
+)
+from .permissions import IsOwnerOrReadOnly
+from xhtml2pdf import pisa
+
+
+# --- Vistas para los modelos de apoyo (solo lectura) ---
+class CategoriaViewSet(viewsets.ReadOnlyModelViewSet):
+    """API endpoint para listar todas las categorías disponibles."""
+    queryset = Categoria.objects.all()
+    serializer_class = CategoriaSerializer
+    permission_classes = [permissions.AllowAny]
 
 class LugarViewSet(viewsets.ReadOnlyModelViewSet):
+    """API endpoint para listar todos los lugares disponibles."""
     queryset = Lugar.objects.all()
     serializer_class = LugarSerializer
     permission_classes = [permissions.AllowAny]
 
 class OrganizadorViewSet(viewsets.ReadOnlyModelViewSet):
+    """API endpoint para listar todos los organizadores disponibles."""
     queryset = Organizador.objects.all()
     serializer_class = OrganizadorSerializer
     permission_classes = [permissions.AllowAny]
 
-class EventoPDFView(View):
-    def get(self, request, *args, **kwargs):
-        pk = self.kwargs.get('pk')
-        evento = Evento.objects.get(pk=pk)
+# --- Vista principal para el CRUD de Eventos ---
+class EventoViewSet(viewsets.ModelViewSet):
+    """
+    Un ViewSet completo para ver y editar eventos.
+    Maneja GET (lista y detalle), POST, PUT, y DELETE.
+    """
+    queryset = Evento.objects.all().select_related('categoria', 'lugar', 'organizador', 'creador')
+    serializer_class = EventoSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    
+    # --- Filtros Potenciados ---
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['categoria', 'lugar', 'organizador']
+    search_fields = ['titulo', 'descripcion']
+    ordering_fields = ['fecha', 'creado_en', 'titulo']
 
-        template = get_template('eventos/evento_pdf.html')
+    def perform_create(self, serializer):
+        """Asigna automáticamente el usuario logueado como el creador del evento."""
+        serializer.save(creador=self.request.user)
+
+
+# --- Vistas de Autenticación ---
+class RegisterView(generics.CreateAPIView):
+    """Endpoint para registrar nuevos usuarios."""
+    queryset = User.objects.all()
+    permission_classes = [permissions.AllowAny]
+    serializer_class = UserSerializer
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    """Endpoint para el login, devuelve un token con datos extra (rol)."""
+    serializer_class = MyTokenObtainPairSerializer
+
+
+# --- Vistas de Funcionalidades Extra (Conservadas) ---
+class EventoPDFView(View):
+    """Genera un PDF con los detalles de un evento específico."""
+    def get(self, request, *args, **kwargs):
+        try:
+            pk = self.kwargs.get('pk')
+            evento = Evento.objects.get(pk=pk)
+        except Evento.DoesNotExist:
+            return HttpResponse("Evento no encontrado.", status=404)
+
+        template = get_template('eventos/evento_pdf.html') # Asegúrate que este sea el nombre de tu template
         context = {'evento': evento}
         html = template.render(context)
         
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="evento_{evento.id}.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="evento_{evento.id}_{evento.titulo}.pdf"'
 
-        pisa_status = pisa.CreatePDF(
-           html, dest=response
-        )
+        pisa_status = pisa.CreatePDF(html, dest=response)
 
         if pisa_status.err:
-           return HttpResponse('Ocurrió un error al generar el PDF <pre>' + html + '</pre>')
+           return HttpResponse(f'Ocurrió un error al generar el PDF: <pre>{html}</pre>')
         return response
-    
-# Vista para ver detalles, editar o borrar un evento
-class EventoDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Evento.objects.all()
-    serializer_class = EventoSerializer
-    # Aplicamos los permisos. El usuario debe estar logueado Y ser el dueño para editar/borrar.
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
-
-class CategoriaViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    API endpoint que permite ver las categorías.
-    No se permite crear, editar o borrar desde aquí, solo leer.
-    """
-    queryset = Categoria.objects.all()
-    serializer_class = CategoriaSerializer
-    permission_classes = [permissions.AllowAny] # Cualquiera puede ver las categorías
-
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
 
 @api_view(['POST'])
-def enviar_correo(request, evento_id):
-    destino = request.data.get('destinatario')
+def enviar_correo_evento(request, evento_id):
+    """
+    Endpoint para enviar los detalles de un evento por correo electrónico.
+    Espera un JSON con: {"destinatario": "correo@ejemplo.com"}
+    """
+    destinatario = request.data.get('destinatario')
 
-    if not destino:
-        return Response({'error': 'Falta el campo destinatario'}, status=status.HTTP_400_BAD_REQUEST)
+    if not destinatario:
+        return Response({'error': 'Falta el campo "destinatario"'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         evento = Evento.objects.get(pk=evento_id)
     except Evento.DoesNotExist:
         return Response({'error': 'Evento no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
-    # Construimos el correo con los detalles del evento
-    asunto = f"Detalles del evento: {evento.titulo}"
+    asunto = f"Invitación al evento: {evento.titulo}"
     mensaje = f"""
-            Hola,
+    Hola,
 
-            Aquí están los detalles del evento:
+    Estás invitado al siguiente evento:
 
-            Título: {evento.titulo}
-            Descripción: {evento.descripcion}
-            Fecha: {evento.fecha}
-            Hora: {evento.hora}
-            Lugar: {evento.lugar}
+    Título: {evento.titulo}
+    Descripción: {evento.descripcion}
+    Fecha: {evento.fecha.strftime('%d de %B de %Y')}
+    Hora: {evento.hora.strftime('%I:%M %p')}
+    Lugar: {evento.lugar.nombre if evento.lugar else 'Por confirmar'}
+    Dirección: {evento.lugar.direccion if evento.lugar else 'Por confirmar'}
 
-            ¡Esperamos verte allí!
-            """
+    ¡Esperamos verte allí!
+    El equipo de {evento.organizador.nombre if evento.organizador else 'Arequipa Hoy'}
+    """
+    remitente = settings.EMAIL_HOST_USER
 
     try:
         send_mail(
             subject=asunto,
             message=mensaje,
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[destino],
-            fail_silently=False
+            from_email=remitente,
+            recipient_list=[destinatario],
+            fail_silently=False,
         )
-        return Response({'mensaje': f'Correo enviado con los detalles del evento {evento_id}.'})
+        return Response({'mensaje': f'Correo sobre el evento "{evento.titulo}" enviado a {destinatario}.'})
     except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': f'Error al enviar el correo: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# NOTA IMPORTANTE: La clase 'EventoDetail' que tenías antes ha sido eliminada
+# porque sus funcionalidades (obtener un evento, actualizarlo y borrarlo)
+# ya están incluidas por defecto en 'EventoViewSet'. Mantenerla sería redundante.
+# El sistema de rutas que usaremos con el ViewSet se encargará de todo.

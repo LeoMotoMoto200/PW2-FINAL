@@ -1,102 +1,89 @@
+# eventos/serializers.py
 
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Categoria, Organizador, Lugar, Evento
+from .models import Evento, Categoria, Lugar, Organizador, Profile
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-class UserSerializer(serializers.ModelSerializer):
-    # Añadimos un campo para recibir el rol desde el frontend.
-    # No es un campo del modelo User, así que es de solo escritura y no se mapea.
-    rol = serializers.CharField(write_only=True, required=False, default='normal')
-
-    class Meta:
-        model = User
-        # Añadimos 'rol' a la lista de campos que el serializer conoce
-        fields = ['username', 'password', 'email', 'first_name', 'last_name', 'rol']
-        extra_kwargs = {'password': {'write_only': True}}
-
-    def create(self, validated_data):
-        # Sacamos el rol de los datos validados antes de crear el usuario
-        rol_data = validated_data.pop('rol', 'normal')
-        
-        # Creamos el usuario como antes
-        user = User.objects.create_user(**validated_data)
-        
-        # Asignamos el rol al perfil del usuario
-        # El perfil se crea automáticamente gracias a la señal que ya tienes
-        user.profile.rol = rol_data
-        user.profile.save()
-        
-        return user
-
+# --- Serializers para los modelos de apoyo (Estos están perfectos) ---
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Categoria
-        fields = '__all__'
-
-class OrganizadorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Organizador
-        fields = '__all__'
+        fields = ['id', 'nombre', 'color']
 
 class LugarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lugar
-        fields = '__all__'
+        fields = ['id', 'nombre', 'direccion', 'mapa_url']
 
+class OrganizadorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organizador
+        fields = ['id', 'nombre', 'contacto']
+
+# --- Serializer de Usuario para el Registro (Mejorado) ---
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name']
+        extra_kwargs = {'password': {'write_only': True}} # Oculta el password en la respuesta
+
+    def create(self, validated_data):
+        # La señal 'post_save' ya crea el Profile con rol 'normal' por defecto.
+        # Si queremos que se registren como 'organizer', lo podemos cambiar aquí.
+        user = User.objects.create_user(**validated_data)
+        user.profile.rol = 'organizer' # Asignamos rol 'organizer' a todos los que se registran
+        user.profile.save()
+        return user
+
+# --- Serializer Principal de Eventos (¡LA GRAN MEJORA!) ---
 class EventoSerializer(serializers.ModelSerializer):
-    """
-    Serializer para el modelo Evento.
-    Maneja la lectura y escritura de datos de eventos.
-    """
-
-    # --- CAMPOS PARA LECTURA (GET) ---
-    # Cuando se pide un evento, estos campos mostrarán los objetos completos.
-    categoria = CategoriaSerializer(read_only=True)
-    organizador = OrganizadorSerializer(read_only=True)
-    lugar = LugarSerializer(read_only=True)
-    # Mostramos el nombre de usuario del creador, no su ID.
+    # CAMBIO #1: Para LEER datos (GET), mostramos la info completa de los objetos relacionados.
+    # Usamos los serializers que definimos arriba. El 'source' apunta al campo del modelo.
+    categoria_info = CategoriaSerializer(source='categoria', read_only=True)
+    lugar_info = LugarSerializer(source='lugar', read_only=True)
+    organizador_info = OrganizadorSerializer(source='organizador', read_only=True)
     creador = serializers.ReadOnlyField(source='creador.username')
 
-    # --- CAMPOS PARA ESCRITURA (POST/PUT) ---
-    # Cuando se crea/edita un evento, el frontend debe enviar los IDs en estos campos.
-    categoria_id = serializers.PrimaryKeyRelatedField(
-        queryset=Categoria.objects.all(), source='categoria', write_only=True
-    )
-    organizador_id = serializers.PrimaryKeyRelatedField(
-        queryset=Organizador.objects.all(), source='organizador', write_only=True, required=False, allow_null=True
-    )
-    lugar_id = serializers.PrimaryKeyRelatedField(
-        queryset=Lugar.objects.all(), source='lugar', write_only=True, required=False, allow_null=True
-    )
-
-    # --- LA CLASE 'META' OBLIGATORIA ---
-    # Asegúrate de que esta clase esté indentada un nivel dentro de EventoSerializer.
     class Meta:
         model = Evento
-        # Lista de todos los campos que el serializer va a gestionar.
+        # CAMBIO #2: La lista de campos ahora es más limpia.
+        # Incluimos los campos del modelo Y nuestros campos '_info' de solo lectura.
         fields = [
-            'id', 'titulo', 'descripcion', 'fecha', 'hora', 'imagen',
-            'categoria', 'organizador', 'lugar', 'creador',
-            'categoria_id', 'organizador_id', 'lugar_id'
+            'id', 'titulo', 'descripcion', 'fecha', 'hora', 'imagen', 
+            'categoria',      # Este campo ahora es para ESCRITURA (espera un ID)
+            'lugar',          # Este campo ahora es para ESCRITURA (espera un ID)
+            'organizador',    # Este campo ahora es para ESCRITURA (espera un ID)
+            'categoria_info', # Este campo es para LECTURA (devuelve el objeto)
+            'lugar_info',     # Este campo es para LECTURA (devuelve el objeto)
+            'organizador_info',# Este campo es para LECTURA (devuelve el objeto)
+            'creador', 
+            'creado_en', 
+            'actualizado_en'
         ]
-        # Hacemos que 'creador' sea de solo lectura en el serializer,
-        # ya que se asigna automáticamente en la vista (con perform_create).
-        read_only_fields = ['creador']
 
+        # CAMBIO #3: Le decimos a DRF que los campos 'categoria', 'lugar' y 'organizador'
+        # son de solo escritura en el contexto de este serializer.
+        # Esto evita que intente mostrarlos como IDs al leer, ya que para eso tenemos los campos '_info'.
+        extra_kwargs = {
+            'categoria': {'write_only': True},
+            'lugar': {'write_only': True},
+            'organizador': {'write_only': True},
+        }
+
+# --- Serializer para el Token de Login (¡Mejorado y más seguro!) ---
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token['username'] = user.username
-        
-        try:
-            # --- INTENTA OBTENER EL ROL DEL PERFIL ---
-            print(f"Usuario: {user.username}, Perfil encontrado: {user.profile}, Rol: {user.profile.rol}")
-            token['rol'] = user.profile.rol 
-        except user._meta.model.profile.RelatedObjectDoesNotExist:
-            # --- SI FALLA, ASIGNA 'normal' POR DEFECTO ---
-            print(f"Usuario: {user.username} NO tiene perfil. Asignando rol 'normal' por defecto.")
-            token['rol'] = 'normal'
 
+        # Añadimos datos personalizados al payload del token
+        token['username'] = user.username
+        try:
+            # Usamos el related_name 'profile' que definimos en el models.py
+            token['rol'] = user.profile.rol
+        except Profile.DoesNotExist:
+            # Si por alguna razón el perfil no existe, asignamos un rol por defecto.
+            token['rol'] = 'normal'
+            
         return token

@@ -1,28 +1,25 @@
-# backend/arequipahoy_project/settings.py
+# aqphoy/settings.py
 
 from pathlib import Path
 import os
+import dj_database_url
+from datetime import timedelta # <-- Moví el import al principio, es una buena práctica
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-tu-clave-secreta-aqui'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+SECRET_KEY = os.environ.get('SECRET_KEY', default='django-insecure-tu-secret-key-aqui-cambiala')
+DEBUG = os.environ.get('RENDER', '') != 'True'
+# Hosts permitidos
 ALLOWED_HOSTS = []
-
-
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+else:
+    # Para desarrollo local
+    ALLOWED_HOSTS.extend(['127.0.0.1', 'localhost'])
 # Application definition
-
-# settings.py
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -34,14 +31,13 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
-    
-    'eventos', # <--- ¡ESTA LÍNEA ES ESENCIAL!
+    'eventos',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # CORS Middleware (debe ir antes que CommonMiddleware)
-    'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # <-- Posición correcta
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -55,7 +51,6 @@ ROOT_URLCONF = 'aqphoy.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # Agregamos la carpeta de templates a nivel de proyecto si es necesario
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -71,125 +66,91 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'aqphoy.wsgi.application'
 
-
 # Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if os.environ.get('RENDER', '') == 'True':
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600
+        )
     }
-}
-
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
-# Internationalization (OBJETIVO 1)
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
-LANGUAGE_CODE = 'es-pe'  # Español de Perú
-
-# Zona horaria para Arequipa/Perú (America/Lima es la correcta para todo Perú)
+# Internationalization
+LANGUAGE_CODE = 'es-pe'
 TIME_ZONE = 'America/Lima'
-
 USE_I18N = True
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-STATIC_URL = 'static/'
-
-# Configuración para archivos multimedia (imágenes subidas por el usuario)
+# Static and Media files
+STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Configuración de Whitenoise para producción
+if not DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- CONFIGURACIÓN PARA LA API Y CORS (OBJETIVOS 3 y 5) ---
+# --- CONFIGURACIÓN PARA LA API, CORS y JWT ---
 
-# Orígenes permitidos para conectar con Angular (ajustar puerto si es necesario)
+# Orígenes permitidos (está perfecto)
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200", # Puerto por defecto de Angular
+    "http://localhost:4200",
     "http://127.0.0.1:4200",
 ]
 
-# Configuración de Django REST Framework
+# --- CAMBIO #2: Configuración de Django REST Framework REORGANIZADA ---
+# Es mejor tener la configuración de permisos y autenticación por defecto aquí.
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.AllowAny',
+        # Por defecto, requerimos que el usuario esté autenticado para acceder a cualquier endpoint.
+        # Las vistas que deben ser públicas (como Register, Categoria, etc.)
+        # sobreescribirán este permiso con 'AllowAny'. Es más seguro así.
+        'rest_framework.permissions.IsAuthenticated',
     ),
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10 # Cantidad de eventos por página en la API}
+    'PAGE_SIZE': 10
 }
 
-# --- ¡LA CONFIGURACIÓN CLAVE QUE FALTA! ---
-# Añade este bloque completo al final del archivo
-from datetime import timedelta
-
+# Configuración de Simple JWT (está perfecta)
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1), # Aumentamos la vida del token
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
-    "UPDATE_LAST_LOGIN": False,
-
     "ALGORITHM": "HS256",
-    "SIGNING_KEY": SECRET_KEY, # Usa la SECRET_KEY de tu proyecto
-    "VERIFYING_KEY": "",
-    "AUDIENCE": None,
-    "ISSUER": None,
-    "JSON_ENCODER": None,
-    "JWK_URL": None,
-    "LEEWAY": 0,
-
+    "SIGNING_KEY": SECRET_KEY,
     "AUTH_HEADER_TYPES": ("Bearer",),
-    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
-    "USER_ID_FIELD": "id",
-    "USER_ID_CLAIM": "user_id",
-    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
-
-    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
-    "TOKEN_TYPE_CLAIM": "token_type",
-    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
-
-    "JTI_CLAIM": "jti",
-
-    # --- ¡ESTA ES LA LÍNEA MÁS IMPORTANTE DE TODAS! ---
-    # Le decimos a simple-jwt que para obtener el token, DEBE usar nuestro serializer personalizado.
+    # ¡La línea más importante! Le dice a JWT que use nuestro serializer personalizado.
     "TOKEN_OBTAIN_SERIALIZER": "eventos.serializers.MyTokenObtainPairSerializer",
 }
 
+# Configuración de Email (está perfecta)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'aqphoy.1@gmail.com'
-EMAIL_HOST_PASSWORD = 'ggou flvm pdvq dzys'
+EMAIL_HOST_USER = 'aqphoy.1@gmail.com' # Reemplazar con tu correo real si lo usas
+EMAIL_HOST_PASSWORD = 'ggou flvm pdvq dzys' # Reemplazar con tu contraseña de aplicación de Google
