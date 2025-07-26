@@ -10,7 +10,7 @@ import { Categoria } from '../core/models/categoria.model'; // Importa el modelo
 })
 export class CategoriaService {
   // La URL del backend que creamos en el Paso 1
-  private apiUrl = 'https://arequipa-hoy-backend.onrender.com/api/categorias/';
+  private apiUrl = 'https://arequipa-hoy-backend.onrender.com/api/categorias';
 
   constructor(private http: HttpClient) { }
 
