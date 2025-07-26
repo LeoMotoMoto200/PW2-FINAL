@@ -8,8 +8,9 @@ from django.views.generic import View
 from django.core.mail import send_mail
 
 from rest_framework import viewsets, generics, permissions, status, filters
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -107,6 +108,7 @@ class EventoPDFView(View):
         return response
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def enviar_correo_evento(request, evento_id):
     """
     Endpoint para enviar los detalles de un evento por correo electrónico.
