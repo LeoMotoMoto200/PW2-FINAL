@@ -136,6 +136,7 @@ def enviar_correo(request, evento_id):
     Hora: {evento.hora.strftime('%I:%M %p')}
     Lugar: {evento.lugar.nombre if evento.lugar else 'Por confirmar'}
     Dirección: {evento.lugar.direccion if evento.lugar else 'Por confirmar'}
+    {"Mapa: " + evento.lugar.mapa_url if evento.lugar and evento.lugar.mapa_url else ""}
 
     ¡Esperamos verte allí!
     El equipo de {evento.organizador.nombre if evento.organizador else 'Arequipa Hoy'}
