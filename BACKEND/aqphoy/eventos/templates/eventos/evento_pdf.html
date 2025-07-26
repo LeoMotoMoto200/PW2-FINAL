@@ -72,9 +72,7 @@
     <div class="container">
         <h1>{{ evento.titulo }}</h1>
 
-        <!-- ¡MEJORA 1: AÑADIMOS LA IMAGEN DEL EVENTO! -->
         {% if evento.imagen %}
-            <!-- Es crucial usar la URL absoluta para que el generador de PDF encuentre la imagen -->
             <img src="http://127.0.0.1:8000{{ evento.imagen.url }}" class="evento-imagen">
         {% endif %}
         
@@ -82,7 +80,6 @@
             <h2>Información General</h2>
             <p><strong>Fecha:</strong> {{ evento.fecha|date:"l, d F, Y" }}</p>
             <p><strong>Hora:</strong> {{ evento.hora|time:"H:i" }} hrs</p>
-            <!-- ¡MEJORA 2: USAMOS IF PARA MÁS SEGURIDAD! -->
             {% if evento.categoria %}
                 <p><strong>Categoría:</strong> {{ evento.categoria.nombre }}</p>
             {% endif %}

@@ -1,6 +1,5 @@
 # eventos/views.py
 
-# --- Imports necesarios ---
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -143,8 +142,3 @@ def enviar_correo_evento(request, evento_id):
         return Response({'mensaje': f'Correo sobre el evento "{evento.titulo}" enviado a {destinatario}.'})
     except Exception as e:
         return Response({'error': f'Error al enviar el correo: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-# NOTA IMPORTANTE: La clase 'EventoDetail' que tenías antes ha sido eliminada
-# porque sus funcionalidades (obtener un evento, actualizarlo y borrarlo)
-# ya están incluidas por defecto en 'EventoViewSet'. Mantenerla sería redundante.
-# El sistema de rutas que usaremos con el ViewSet se encargará de todo.

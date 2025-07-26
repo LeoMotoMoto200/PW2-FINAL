@@ -14,7 +14,7 @@ class Categoria(models.Model):
     class Meta:
         verbose_name = "Categoría"
         verbose_name_plural = "Categorías"
-        ordering = ['nombre'] # Opcional: para que las categorías salgan ordenadas
+        ordering = ['nombre'] 
 
 class Organizador(models.Model):
     nombre = models.CharField(max_length=200, verbose_name="Nombre del Organizador")
@@ -26,7 +26,7 @@ class Organizador(models.Model):
     class Meta:
         verbose_name = "Organizador"
         verbose_name_plural = "Organizadores"
-        ordering = ['nombre'] # Opcional: para que salgan ordenados
+        ordering = ['nombre'] 
 
 class Lugar(models.Model):
     nombre = models.CharField(max_length=200, verbose_name="Nombre del Lugar")
@@ -39,8 +39,7 @@ class Lugar(models.Model):
     class Meta:
         verbose_name = "Lugar"
         verbose_name_plural = "Lugares"
-        ordering = ['nombre'] # Opcional: para que salgan ordenados
-
+        ordering = ['nombre'] 
 class Evento(models.Model):
     titulo = models.CharField(max_length=200, verbose_name="Título del Evento")
     descripcion = models.TextField(verbose_name="Descripción")
@@ -71,8 +70,6 @@ class Profile(models.Model):
         ('normal', 'Usuario Normal'),
         ('organizer', 'Organizador'),
     )
-    # --- CAMBIO SUGERIDO ---
-    # Añadimos related_name='profile' para poder hacer user.profile
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     rol = models.CharField(max_length=10, choices=USER_ROLE_CHOICES, default='normal')
 
@@ -84,5 +81,3 @@ class Profile(models.Model):
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
-    # Opcional: si quieres que se guarde el perfil cada vez que se guarda el usuario
-    # instance.profile.save()

@@ -3,7 +3,7 @@
 from pathlib import Path
 import os
 import dj_database_url
-from datetime import timedelta # <-- Moví el import al principio, es una buena práctica
+from datetime import timedelta 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,7 +37,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'corsheaders.middleware.CorsMiddleware', # <-- Posición correcta
+    'corsheaders.middleware.CorsMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -101,32 +101,32 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Configuración de Whitenoise para producción
 if not DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- CONFIGURACIÓN PARA LA API, CORS y JWT ---
-
-# Orígenes permitidos (está perfecto)
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
     "http://127.0.0.1:4200",
 ]
 
-# --- CAMBIO #2: Configuración de Django REST Framework REORGANIZADA ---
-# Es mejor tener la configuración de permisos y autenticación por defecto aquí.
+VERCEL_URL = os.environ.get('VERCEL_URL')
+if VERCEL_URL:
+    CORS_ALLOWED_ORIGINS.append(VERCEL_URL)
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://arequipa-hoy-frontend.*\.vercel\.app$",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        # Por defecto, requerimos que el usuario esté autenticado para acceder a cualquier endpoint.
-        # Las vistas que deben ser públicas (como Register, Categoria, etc.)
-        # sobreescribirán este permiso con 'AllowAny'. Es más seguro así.
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_FILTER_BACKENDS': (
@@ -136,14 +136,13 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
-# Configuración de Simple JWT (está perfecta)
+# Configuración de Simple JWT 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ALGORITHM": "HS256",
     "SIGNING_KEY": SECRET_KEY,
     "AUTH_HEADER_TYPES": ("Bearer",),
-    # ¡La línea más importante! Le dice a JWT que use nuestro serializer personalizado.
     "TOKEN_OBTAIN_SERIALIZER": "eventos.serializers.MyTokenObtainPairSerializer",
 }
 
@@ -152,5 +151,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'aqphoy.1@gmail.com' # Reemplazar con tu correo real si lo usas
-EMAIL_HOST_PASSWORD = 'ggou flvm pdvq dzys' # Reemplazar con tu contraseña de aplicación de Google
+EMAIL_HOST_USER = 'aqphoy.1@gmail.com' 
+EMAIL_HOST_PASSWORD = 'ggou flvm pdvq dzys' 
