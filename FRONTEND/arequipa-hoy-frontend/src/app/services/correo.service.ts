@@ -11,6 +11,6 @@ export class CorreoService {
   constructor(private http: HttpClient) {}
 
   enviarCorreo(eventoId: number, destinatario: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${eventoId}/enviar-correo/`, { destinatario: destinatario });
+    return this.http.post(`${this.apiUrl}${eventoId}/enviar-correo/`, { destinatario: destinatario });
   }
 }
