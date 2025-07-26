@@ -14,8 +14,8 @@ import { Evento } from '../../core/models/evento.model';
   standalone: true,
   // Añadimos RouterLink para poder tener un botón de "Volver"
   imports: [CommonModule, RouterLink, CorreoComponent], 
-  templateUrl: './detalle-evento.html',
-  styleUrls: ['./detalle-evento.css']
+  templateUrl: './detalle-evento.component.html',
+  styleUrls: ['./detalle-evento.component.css']
 })
 export class DetalleEventoComponent implements OnInit {
 

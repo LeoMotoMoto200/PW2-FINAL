@@ -23,18 +23,30 @@ class OrganizadorSerializer(serializers.ModelSerializer):
 
 # --- Serializer de Usuario para el Registro (Mejorado) ---
 class UserSerializer(serializers.ModelSerializer):
+    # 1. Añadimos un campo 'rol' que no está en el modelo User, pero que recibiremos del frontend.
+    rol = serializers.CharField(write_only=True, required=False, default='normal')
+
     class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name']
-        extra_kwargs = {'password': {'write_only': True}} # Oculta el password en la respuesta
+            model = User
+            # 2. Añadimos 'rol' a la lista de campos que este serializer entiende.
+            fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'rol']
+            extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        # La señal 'post_save' ya crea el Profile con rol 'normal' por defecto.
-        # Si queremos que se registren como 'organizer', lo podemos cambiar aquí.
-        user = User.objects.create_user(**validated_data)
-        user.profile.rol = 'organizer' # Asignamos rol 'organizer' a todos los que se registran
-        user.profile.save()
-        return user
+            # Sacamos el 'rol' que nos envió el frontend. Si no vino, usamos 'normal'.
+            user_rol = validated_data.pop('rol', 'normal')
+            
+            # Creamos el usuario con el resto de los datos.
+            user = User.objects.create_user(**validated_data)
+            
+            # Asignamos el rol correcto al perfil del usuario.
+            try:
+                user.profile.rol = user_rol
+                user.profile.save()
+            except Profile.DoesNotExist:
+                Profile.objects.create(user=user, rol=user_rol)
+                
+            return user
 
 # --- Serializer Principal de Eventos (¡LA GRAN MEJORA!) ---
 class EventoSerializer(serializers.ModelSerializer):

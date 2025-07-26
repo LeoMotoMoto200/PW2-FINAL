@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from './services/auth.service'; // Asegúrate de que la ruta sea correcta
@@ -12,9 +12,14 @@ import { AuthService } from './services/auth.service'; // Asegúrate de que la r
 })
 export class AppComponent {
   title = 'Arequipa Hoy';
+  isScrolled = false;
   
   // Hacemos el servicio 'public' para poder usar 'authService.isLoggedIn()' en el HTML
   constructor(public authService: AuthService) {}
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    this.isScrolled = window.scrollY > 10;
+  }
 
   // --- ¡AQUÍ ESTÁ LA FUNCIÓN QUE FALTABA! ---
   logout(): void {

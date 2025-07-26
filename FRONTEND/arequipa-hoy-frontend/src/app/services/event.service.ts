@@ -10,7 +10,7 @@ import { map } from 'rxjs/operators'; // <-- ¡IMPORTANTE! Importa el operador m
 })
 export class EventService {
   // La URL base para el CRUD de eventos.
-  private apiUrl = 'https://arequipa-hoy-backend.onrender.com/api/eventos/';
+  private apiUrl = 'http://127.0.0.1:8000/api/eventos/';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 

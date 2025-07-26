@@ -8,13 +8,11 @@ export const organizerGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const toastr = inject(ToastrService);
 
-  // Revisa si el usuario tiene el rol de organizador.
   if (authService.isOrganizer()) {
-    return true; // ¡Adelante, VIP!
+    return true; // Es organizador, puede pasar.
   } else {
-    // Si no es organizador...
-    toastr.error('No tienes los permisos necesarios para acceder a esta página.', 'Acceso Denegado');
-    router.navigate(['/home']); // Lo mandamos a la página principal.
-    return false; // ¡No puedes pasar!
+    toastr.error('No tienes permiso para acceder a esta página.', 'Acceso Denegado');
+    router.navigate(['/home']);
+    return false; // No es organizador, no puede pasar.
   }
 };

@@ -4,7 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { EventosRoutingModule } from './eventos-routing-module';
 
 import { ListadoEventos } from './listado-eventos/listado-eventos';
-import { DetalleEvento } from './detalle-evento/detalle-evento';
+import { DetalleEventoComponent } from './detalle-evento/detalle-evento.component';
 
 @NgModule({
   imports: [
@@ -12,7 +12,7 @@ import { DetalleEvento } from './detalle-evento/detalle-evento';
     HttpClientModule,
     EventosRoutingModule,
     ListadoEventos,
-    DetalleEvento
+    DetalleEventoComponent
   ]
 })
 export class EventosModule { }

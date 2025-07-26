@@ -1,34 +1,38 @@
-/* src/styles.css (VERSIÓN FINAL Y LIMPIA) */
+/* src/styles.css (VERSIÓN MEJORADA) */
 
-/* --- FUENTE GLOBAL (OPCIONAL) --- */
-/* Si quieres usar una fuente de Google, asegúrate de importarla en tu index.html */
+/* --- 1. IMPORTACIONES Y VARIABLES DE COLOR --- */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
+@import 'ngx-toastr/toastr'; /* Para las notificaciones */
 
-/* --- ESTILOS DEL BODY (CON EL FONDO FIJO Y NOMBRES DE IMAGEN CORRECTOS) --- */
-/* src/styles.css */
+:root {
+  --bs-primary: #D32F2F;   /* Un rojo Arequipeño, como el rocoto */
+  --bs-secondary: #6c757d; /* Gris estándar */
+  --bs-success: #2E7D32;   /* Verde oscuro */
+  --bs-info: #0288D1;      /* Azul claro */
+  --bs-warning: #FBC02D;   /* Amarillo/Mostaza */
+  --bs-danger: #C62828;    /* Rojo más oscuro para errores */
+  --bs-light: #f8f9fa;     /* Gris muy claro */
+  --bs-dark: #212529;      /* Negro estándar */
+  --bs-font-sans-serif: 'Poppins', sans-serif; /* ¡Nuestra nueva fuente! */
+}
 
+/* --- 2. ESTILOS GLOBALES DEL BODY --- */
 body {
-  /* --- FONDO FIJO CON MÁS VISIBILIDAD --- */
-  /* CORRECCIÓN: He bajado los valores de opacidad de 0.85 y 0.98 a 0.7 y 0.8.
-     ¡Juega con estos números hasta que te guste! Un valor más bajo = Misti más visible. */
-  background-image: linear-gradient(rgba(248, 249, 250, 0.7), rgba(248, 249, 250, 0.8)), url('assets/images/misti.jpg');
+  background-image: linear-gradient(rgba(248, 249, 250, 0.92), rgba(248, 249, 250, 0.98)), url('assets/images/misti.jpg');
   background-size: cover;
   background-position: center center;
   background-attachment: fixed;
   background-repeat: no-repeat;
-  
-  min-height: 100vh;
-  font-family: 'Poppins', sans-serif;
-  
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
 html {
   height: 100%;
 }
 
-/* --- ESTRUCTURA PARA EL FOOTER FIJO --- */
+/* --- 3. ESTRUCTURA PARA FOOTER FIJO --- */
 app-root {
   display: flex;
   flex-direction: column;
@@ -39,35 +43,58 @@ main {
   flex: 1 0 auto;
 }
 
-/* --- ESTILOS GLOBALES PARA TARJETAS Y BOTONES --- */
+/* --- 4. ESTILOS "GUAY" PARA COMPONENTES COMUNES --- */
+
+/* Botones más atractivos */
 .btn {
-  transition: all 0.2s ease-in-out;
+  border-radius: 50px; /* ¡Botones redondeados! */
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
 }
 
+.btn-primary {
+  background-color: var(--bs-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4);
+}
+
+/* Formularios más limpios */
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(211, 47, 47, 0.25);
+}
+
+/* Tarjetas con más estilo */
 .card {
-  border: 0;
-  border-radius: 0.75rem;
-}
-
-/* --- ANIMACIONES Y EFECTOS "GUAY" PARA LAS TARJETAS --- */
-
-/* 1. Efecto Hover: la tarjeta se eleva */
-.shadow-hover {
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.shadow-hover:hover {
+.card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.15)!important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* 2. Efecto de entrada en cascada */
+/* Animación de entrada para las tarjetas */
 .card-animation {
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
-
 .card-animation.visible {
   opacity: 1;
   transform: translateY(0);

@@ -1,52 +1,57 @@
-// src/app/pages/register/register.component.ts
-
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router'; // Importa RouterModule para routerLink
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { ToastrService } from 'ngx-toastr'; // Para notificaciones
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule], // Añade RouterModule
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
-  // El modelo ya no necesita el campo 'rol'
-  model: any = {};
+  
+  // ¡CORRECCIÓN CLAVE!
+  // El modelo ahora SÍ incluye el campo 'rol' y le damos un valor por defecto.
+  model: any = {
+    rol: 'normal' // Por defecto, estará seleccionado "Usuario".
+  };
+  
   errorMessage: string = '';
+  isLoading: boolean = false; // Para mostrar estado de carga
 
   constructor(
     private authService: AuthService, 
     private router: Router,
-    private toastr: ToastrService // Inyecta el servicio de notificaciones
+    private toastr: ToastrService
   ) { }
 
   onSubmit() {
-    // Pequeña validación para asegurar que los campos no estén vacíos
-    if (!this.model.username || !this.model.email || !this.model.password) {
+    if (!this.model.username || !this.model.email || !this.model.password || !this.model.rol) {
       this.toastr.warning('Por favor, completa todos los campos.', 'Formulario Incompleto');
       return;
     }
 
+    this.isLoading = true;
+
+    // Ahora, el 'this.model' que enviamos contiene el rol seleccionado por el usuario.
     this.authService.register(this.model).subscribe({
       next: () => {
-        // Reemplazamos el alert() por una notificación más profesional.
+        this.isLoading = false;
         this.toastr.success('¡Tu cuenta ha sido creada!', '¡Registro Exitoso!');
         this.toastr.info('Ahora serás redirigido para iniciar sesión.', 'Siguiente paso');
         
-        // Redirigimos al login después de un pequeño retraso para que se lean los toasts.
         setTimeout(() => {
           this.router.navigate(['/login']);
-        }, 2000); // 2 segundos de espera
+        }, 2000);
       },
-      error: (err) => {
-        // Mejoramos el manejo de errores.
+      error: (err: any) => {
+        this.isLoading = false;
         this.toastr.error('El nombre de usuario o el email ya podrían estar en uso.', 'Error de Registro');
-        this.errorMessage = 'No se pudo completar el registro. Por favor, intenta con otros datos.';
+        this.errorMessage = 'No se pudo completar el registro. Intenta con otros datos.';
         console.error('Error de registro:', err);
       }
     });
