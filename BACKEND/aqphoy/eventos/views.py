@@ -84,17 +84,26 @@ class EventoPDFView(View):
         except Evento.DoesNotExist:
             return HttpResponse("Evento no encontrado.", status=404)
 
-        template = get_template('eventos/evento_pdf.html') # Asegúrate que este sea el nombre de tu template
-        context = {'evento': evento}
+        image_url = None
+        if evento.imagen:
+            base_url = request.build_absolute_uri('/')[:-1] 
+            image_url = base_url + evento.imagen.url
+
+        template = get_template('eventos/evento_pdf.html')
+        # Pasamos la URL completa al template
+        context = {
+            'evento': evento,
+            'image_url': image_url 
+        }
         html = template.render(context)
         
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="evento_{evento.id}_{evento.titulo}.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="evento_{evento.id}.pdf"'
 
         pisa_status = pisa.CreatePDF(html, dest=response)
 
         if pisa_status.err:
-           return HttpResponse(f'Ocurrió un error al generar el PDF: <pre>{html}</pre>')
+           return HttpResponse(f'Ocurrió un error al generar el PDF.')
         return response
 
 @api_view(['POST'])

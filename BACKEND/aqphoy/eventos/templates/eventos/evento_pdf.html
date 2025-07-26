@@ -72,8 +72,8 @@
     <div class="container">
         <h1>{{ evento.titulo }}</h1>
 
-        {% if evento.imagen %}
-            <img src="http://127.0.0.1:8000{{ evento.imagen.url }}" class="evento-imagen">
+        {% if image_url %}
+            <img src="{{ image_url }}" class="evento-imagen">
         {% endif %}
         
         <div class="info-block">
