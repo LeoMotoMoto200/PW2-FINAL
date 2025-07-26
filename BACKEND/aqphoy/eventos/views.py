@@ -109,7 +109,7 @@ class EventoPDFView(View):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def enviar_correo_evento(request, evento_id):
+def enviar_correo(request, evento_id):
     """
     Endpoint para enviar los detalles de un evento por correo electrónico.
     Espera un JSON con: {"destinatario": "correo@ejemplo.com"}

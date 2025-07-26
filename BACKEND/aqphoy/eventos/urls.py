@@ -10,7 +10,7 @@ from .views import (
     CategoriaViewSet, 
     LugarViewSet, 
     OrganizadorViewSet,
-    enviar_correo_evento
+    enviar_correo
 )
 
 # Creamos un router para manejar automáticamente las URLs de los ViewSets.
@@ -28,7 +28,7 @@ urlpatterns = [
 
     # --- RUTAS DE FUNCIONALIDADES EXTRA (LAS TUYAS) ---
     path('eventos/<int:pk>/pdf/', EventoPDFView.as_view(), name='evento-pdf-detail'),
-    path('eventos/<int:evento_id>/enviar-correo/', enviar_correo_evento, name='enviar-correo-evento'),
+    path('eventos/<int:evento_id>/enviar-correo/', enviar_correo, name='enviar-correo'),
 
     # Incluimos todas las URLs del router (CRUDs) al final.
     path('', include(router.urls)),
