@@ -10,7 +10,7 @@ import { PaginatedResponse } from '../models/evento.model'; // O donde la hayas 
   providedIn: 'root'
 })
 export class EventosService {
-  private apiUrl = 'http://127.0.0.1:8000/api/eventos/';
+  private apiUrl = 'https://arequipa-hoy-backend.onrender.com/api/eventos/';
 
   constructor(private http: HttpClient) { }
 

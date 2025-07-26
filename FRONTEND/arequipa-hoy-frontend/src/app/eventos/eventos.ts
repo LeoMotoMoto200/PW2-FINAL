@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class Eventos {
-  private apiUrl = '/api/eventos/';
+  private apiUrl = 'https://arequipa-hoy-backend.onrender.com/api/eventos/';
 
   constructor(private http: HttpClient) {}
 

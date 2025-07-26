@@ -11,20 +11,10 @@ import { organizerGuard } from './guards/organizer.guard';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
-  { 
-    path: 'home', 
-    component: HomeComponent // El Home es 100% público
-  },
+  { path: 'home', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { 
-    path: 'eventos/:id', // La ruta de detalles es pública
-    component: DetalleEventoComponent
-  },
-  { 
-    path: 'dashboard', 
-    component: DashboardComponent, 
-    canActivate: [organizerGuard] 
-  },
+  { path: 'eventos/:id',component: DetalleEventoComponent},
+  { path: 'dashboard', component: DashboardComponent, canActivate: [organizerGuard] },
   { path: '**', redirectTo: '' } 
 ];
