@@ -17,7 +17,7 @@ import { Evento } from '../../core/models/evento.model';
   templateUrl: './detalle-evento.html',
   styleUrls: ['./detalle-evento.css']
 })
-export class DetalleEvento implements OnInit {
+export class DetalleEventoComponent implements OnInit {
 
   // Declaramos un Observable de tipo Evento (o null)
   evento$!: Observable<Evento | null>;

@@ -3,7 +3,7 @@ import { LandingComponent } from './pages/landing/landing.component';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
-import { DetalleEvento } from './eventos/detalle-evento/detalle-evento';
+import { DetalleEventoComponent } from './eventos/detalle-evento/detalle-evento.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { authGuard } from './guards/auth.guard';
 
@@ -18,7 +18,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { 
     path: 'eventos/:id', 
-    component: DetalleEvento,
+    component: DetalleEventoComponent,
   },
   { 
     path: 'dashboard', 
