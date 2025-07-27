@@ -1,6 +1,7 @@
 // src/app/eventos/detalle-evento/detalle-evento.ts
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router'; // <-- Añadir RouterLink
+import { ActivatedRoute, RouterLink, Router } from '@angular/router'; // <-- Añadir RouterLink
+import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { Observable, of } from 'rxjs'; // <-- Importar Observable y of
 import { catchError, switchMap } from 'rxjs/operators'; // <-- Importar catchError y switchMap
@@ -25,10 +26,17 @@ export class DetalleEventoComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private eventosService: EventosService
+    private eventosService: EventosService,
+    private routeNlogin: Router,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
+    if (!this.authService.isLoggedIn()){
+      this.routeNlogin.navigate(['/']);
+      return;
+    }
+
     // Usamos el observable 'paramMap' para reaccionar a cambios en la URL
     this.evento$ = this.route.paramMap.pipe(
       switchMap(params => {
