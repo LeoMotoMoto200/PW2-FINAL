@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -12,7 +12,7 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   
   // ¡CORRECCIÓN CLAVE!
   // El modelo ahora SÍ incluye el campo 'rol' y le damos un valor por defecto.
@@ -28,6 +28,12 @@ export class RegisterComponent {
     private router: Router,
     private toastr: ToastrService
   ) { }
+
+  ngOnInit(): void {
+      if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/home']);
+    }
+  }
 
   onSubmit() {
     if (!this.model.username || !this.model.email || !this.model.password || !this.model.rol) {

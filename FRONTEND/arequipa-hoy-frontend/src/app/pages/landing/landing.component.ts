@@ -1,8 +1,9 @@
 // frontend/src/app/pages/landing/landing.component.ts
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router'; // Necesario para los botones [routerLink]
+import { Router, RouterLink } from '@angular/router'; // Necesario para los botones [routerLink]
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-landing',
@@ -11,7 +12,16 @@ import { RouterLink } from '@angular/router'; // Necesario para los botones [rou
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.css']
 })
-export class LandingComponent {
+export class LandingComponent implements OnInit{
   // No necesitamos lógica aquí por ahora. El componente solo muestra HTML estático.
-  constructor() { }
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/home']);
+    }
+  }
 }

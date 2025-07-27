@@ -27,11 +27,7 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     // Esta lógica está perfecta. Si el usuario ya está logueado, lo saca de aquí.
     if (this.authService.isLoggedIn()) {
-      if (this.authService.isOrganizer()) {
-        this.router.navigate(['/dashboard']);
-      } else {
-        this.router.navigate(['/']); // Redirige a la página principal
-      }
+        this.router.navigate(['/home']); // Redirige a la página principal
     }
   }
 
