@@ -67,9 +67,15 @@ El trabajo futuro se centrará en la implementación de las siguientes funcional
 
 * Giovanni:
    *    **Teoria:**
-        **https://youtu.be/IvgTi-FSTGI**
-        **https://youtu.be/KaaSMzIiC9Q**
+      *    **https://youtu.be/IvgTi-FSTGI**
+      *    **https://youtu.be/KaaSMzIiC9Q**
 
    *    **Laboratorio:**
         **https://youtu.be/GpjoJX0uk1o**
         **https://youtu.be/t_HyhGVKyzs**
+
+## Coevaluación:
+* Giovanni:
+   * **Palma Apaza Santiago Enrique: 25%** 
+   * **Baca Calsin Leonardo Juan Jose: 25%** 
+   * **German Arturo Chipana Jeronimo: 25%**
