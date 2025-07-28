@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from .models import Evento, Categoria, Lugar, Organizador, Profile
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-# --- Serializers para los modelos de apoyo (Estos están perfectos) ---
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Categoria
@@ -21,14 +20,14 @@ class OrganizadorSerializer(serializers.ModelSerializer):
         model = Organizador
         fields = ['id', 'nombre', 'contacto']
 
-# --- Serializer de Usuario para el Registro (Mejorado) ---
+# --- Serializer de Usuario para el Registro ---
 class UserSerializer(serializers.ModelSerializer):
-    # 1. Añadimos un campo 'rol' que no está en el modelo User, pero que recibiremos del frontend.
+    # Añadimos un campo 'rol' que no está en el modelo User, pero que recibiremos del frontend.
     rol = serializers.CharField(write_only=True, required=False, default='normal')
 
     class Meta:
             model = User
-            # 2. Añadimos 'rol' a la lista de campos que este serializer entiende.
+            # Añadimos 'rol' a la lista de campos que este serializer entiende.
             fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'rol']
             extra_kwargs = {'password': {'write_only': True}}
 
@@ -48,9 +47,9 @@ class UserSerializer(serializers.ModelSerializer):
                 
             return user
 
-# --- Serializer Principal de Eventos (¡LA GRAN MEJORA!) ---
+# --- Serializer Principal de Eventos ---
 class EventoSerializer(serializers.ModelSerializer):
-    # CAMBIO #1: Para LEER datos (GET), mostramos la info completa de los objetos relacionados.
+    # #1: Para LEER datos (GET), mostramos la info completa de los objetos relacionados.
     # Usamos los serializers que definimos arriba. El 'source' apunta al campo del modelo.
     categoria_info = CategoriaSerializer(source='categoria', read_only=True)
     lugar_info = LugarSerializer(source='lugar', read_only=True)
@@ -59,22 +58,22 @@ class EventoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Evento
-        # CAMBIO #2: La lista de campos ahora es más limpia.
+        # #2: La lista de campos ahora es más limpia.
         # Incluimos los campos del modelo Y nuestros campos '_info' de solo lectura.
         fields = [
             'id', 'titulo', 'descripcion', 'fecha', 'hora', 'imagen', 
-            'categoria',      # Este campo ahora es para ESCRITURA (espera un ID)
-            'lugar',          # Este campo ahora es para ESCRITURA (espera un ID)
-            'organizador',    # Este campo ahora es para ESCRITURA (espera un ID)
-            'categoria_info', # Este campo es para LECTURA (devuelve el objeto)
-            'lugar_info',     # Este campo es para LECTURA (devuelve el objeto)
-            'organizador_info',# Este campo es para LECTURA (devuelve el objeto)
+            'categoria',      
+            'lugar',          
+            'organizador',   
+            'categoria_info',
+            'lugar_info',    
+            'organizador_info',
             'creador', 
             'creado_en', 
             'actualizado_en'
         ]
 
-        # CAMBIO #3: Le decimos a DRF que los campos 'categoria', 'lugar' y 'organizador'
+        # #3: Le decimos a DRF que los campos 'categoria', 'lugar' y 'organizador'
         # son de solo escritura en el contexto de este serializer.
         # Esto evita que intente mostrarlos como IDs al leer, ya que para eso tenemos los campos '_info'.
         extra_kwargs = {
@@ -83,7 +82,7 @@ class EventoSerializer(serializers.ModelSerializer):
             'organizador': {'write_only': True},
         }
 
-# --- Serializer para el Token de Login (¡Mejorado y más seguro!) ---
+# --- Serializer para el Token de Login ---
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):

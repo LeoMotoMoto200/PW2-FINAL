@@ -20,7 +20,7 @@ router.register(r'categorias', CategoriaViewSet, basename='categoria')
 router.register(r'lugares', LugarViewSet, basename='lugar')
 router.register(r'organizadores', OrganizadorViewSet, basename='organizador')
 
-# Tu lista de URLs, ahora con todo centralizado y ordenado.
+# Lista de URLs, ahora con todo centralizado y ordenado.
 urlpatterns = [
     # --- RUTAS DE AUTENTICACIÓN ---
     path('register/', RegisterView.as_view(), name='auth_register'),

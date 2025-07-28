@@ -2,9 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-// ... otros imports
-import { Evento, PaginatedResponse } from '../../core/models/evento.model'; // Importa ambos del maestro
-
+import { Evento, PaginatedResponse } from '../../core/models/evento.model'; 
 import { EventService } from '../../services/event.service';
 import { CategoriaService } from '../../services/categoria.service';
 import { LugarService } from '../../services/lugar.service';
@@ -40,14 +38,11 @@ export class DashboardComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // CORRECCIÓN: Llamada inicial sin filtros
     this.loadEvents({});
     this.loadDropdownData();
   }
 
 loadDropdownData(): void {
-  // CORRECCIÓN: Accedemos a la propiedad 'results' si la respuesta es paginada.
-  // Usamos `|| data` como fallback por si alguna de estas APIs no está paginada.
   this.categoriaService.getCategorias().subscribe((data: any) => {
     this.categorias = data.results || data;
   });
@@ -85,7 +80,6 @@ loadDropdownData(): void {
       this.eventService.updateEvent(this.eventModel.id, this.eventModel).subscribe({
         next: () => {
           this.toastr.success('Evento actualizado correctamente.', '¡Éxito!');
-          // CORRECCIÓN: Recargamos la lista sin filtros para ver todo
           this.loadEvents({});
           this.cancelEdit();
         },
@@ -105,7 +99,6 @@ loadDropdownData(): void {
       this.eventService.addEvent(formData).subscribe({
         next: () => {
           this.toastr.success('Evento creado correctamente.', '¡Éxito!');
-          // CORRECCIÓN: Recargamos la lista sin filtros para ver el nuevo evento
           this.loadEvents({});
           this.resetForm();
         },
@@ -146,7 +139,6 @@ loadDropdownData(): void {
       this.eventService.deleteEvent(id).subscribe({
         next: () => {
           this.toastr.info('Evento eliminado.', 'Operación Exitosa');
-          // CORRECCIÓN: Recargamos la lista sin filtros
           this.loadEvents({});
         },
         error: (err: any) => this.toastr.error('Error al eliminar el evento.', 'Error')

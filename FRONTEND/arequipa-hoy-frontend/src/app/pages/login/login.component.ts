@@ -5,12 +5,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router'; // Importa RouterModule para routerLink
 import { AuthService } from '../../services/auth.service';
-import { ToastrService } from 'ngx-toastr'; // Para notificaciones bonitas
+import { ToastrService } from 'ngx-toastr'; 
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule], // Añade RouterModule
+  imports: [CommonModule, FormsModule, RouterModule], 
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -21,18 +21,15 @@ export class LoginComponent implements OnInit {
   constructor(
     private authService: AuthService, 
     private router: Router,
-    private toastr: ToastrService // Inyecta ToastrService
+    private toastr: ToastrService 
   ) { }
 
   ngOnInit(): void {
-    // Esta lógica está perfecta. Si el usuario ya está logueado, lo saca de aquí.
     if (this.authService.isLoggedIn()) {
         this.router.navigate(['/home']); // Redirige a la página principal
     }
   }
 
-  // --- onSubmit SIMPLIFICADO ---
-  // Ahora confía en el AuthService para manejar el token y el estado.
   onSubmit() {
     if (!this.model.username || !this.model.password) {
       this.toastr.warning('Por favor, ingresa tu usuario y contraseña.', 'Campos incompletos');
@@ -41,18 +38,16 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(this.model).subscribe({
       next: () => {
-        // El servicio ya guardó el token y actualizó el estado.
-        // Ahora solo leemos ese estado para decidir a dónde ir.
+        // El servicio ya guardó el token y actualizó el estado.r.
         this.toastr.success(`¡Bienvenido, ${this.authService.currentUserValue.username}!`, 'Login Exitoso');
 
         if (this.authService.isOrganizer()) {
           this.router.navigate(['/dashboard']);
         } else {
-          this.router.navigate(['/']); // O a la página que corresponda para usuarios normales
+          this.router.navigate(['/']); 
         }
       },
       error: (err) => {
-        // El manejo de errores está bien.
         this.toastr.error('Usuario o contraseña incorrectos.', 'Error de Autenticación');
         this.errorMessage = 'No se pudo iniciar sesión. Verifica tus credenciales.';
         console.error('Error de login:', err);

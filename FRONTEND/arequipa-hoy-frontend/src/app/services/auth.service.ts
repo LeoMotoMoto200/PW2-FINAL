@@ -3,10 +3,10 @@
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of } from 'rxjs'; // Importamos 'of' para el logout
-import { tap } from 'rxjs/operators'; // El 'tap' va en 'rxjs/operators'
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { tap } from 'rxjs/operators'; 
 import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode'; // Necesitarás instalar esta librería
+import { jwtDecode } from 'jwt-decode'; 
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,6 @@ export class AuthService {
   private apiUrl = 'https://arequipa-hoy-backend.onrender.com/api';
   private isBrowser: boolean;
 
-  // Tu BehaviorSubject está perfecto para notificar cambios en la autenticación.
   private currentUserSubject: BehaviorSubject<any>;
   public currentUser$: Observable<any>;
 
@@ -24,20 +23,17 @@ export class AuthService {
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // Es crucial verificar si estamos en el navegador antes de tocar localStorage.
     this.isBrowser = isPlatformBrowser(this.platformId);
-    // Inicializamos el BehaviorSubject con los datos del token si existen.
     this.currentUserSubject = new BehaviorSubject<any>(this.getUserFromToken());
     this.currentUser$ = this.currentUserSubject.asObservable();
   }
 
-  // Este método está perfecto.
   private getUserFromToken(): any | null {
     if (this.isBrowser) {
       const token = this.getToken();
       if (token) {
         try {
-          return jwtDecode(token); // Decodifica el token para obtener el payload (username, rol, etc.)
+          return jwtDecode(token); 
         } catch (e) {
           console.error('Token inválido:', e);
           this.clearLocalStorage();
@@ -48,17 +44,14 @@ export class AuthService {
     return null;
   }
   
-  // Este método también está perfecto.
   public get currentUserValue(): any {
     return this.currentUserSubject.value;
   }
 
-  // La función de registro está bien.
   register(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register/`, userData);
   }
 
-  // --- ¡AQUÍ ESTÁ EL CAMBIO MÁS IMPORTANTE! ---
   login(userData: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/login/`, userData).pipe(
       tap(response => {
@@ -77,7 +70,6 @@ export class AuthService {
     );
   }
 
-  // --- LOGOUT MEJORADO ---
   logout(): void {
     if (this.isBrowser) {
       this.clearLocalStorage();
@@ -101,13 +93,11 @@ export class AuthService {
     return null;
   }
   
-  // isLoggedIn ahora es más simple y robusto.
   isLoggedIn(): boolean {
     // Si hay un valor en currentUserValue (no es null), el usuario está logueado.
     return !!this.currentUserValue;
   }
   
-  // ¡Este método está perfecto para proteger rutas o mostrar/ocultar botones!
   isOrganizer(): boolean {
     return this.isLoggedIn() && this.currentUserValue?.rol === 'organizer';
   }

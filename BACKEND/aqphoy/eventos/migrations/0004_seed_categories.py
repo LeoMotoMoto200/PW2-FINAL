@@ -18,7 +18,6 @@ CATEGORIAS_A_CREAR = [
 # --- LA FUNCIÓN QUE METE LOS DATOS ---
 def seed_data(apps, schema_editor):
     # Obtenemos el modelo 'Categoria' de la forma correcta para las migraciones.
-    # ¡No se puede importar directamente el modelo!
     Categoria = apps.get_model('eventos', 'Categoria')
 
     # Iteramos sobre nuestra lista
@@ -26,7 +25,6 @@ def seed_data(apps, schema_editor):
         # Usamos update_or_create:
         # - Si ya existe una categoría con ese nombre, solo actualiza el color.
         # - Si no existe, la crea con el nombre y el color.
-        # ¡Esto evita crear duplicados si corres la migración varias veces!
         Categoria.objects.update_or_create(
             nombre=cat_data["nombre"], 
             defaults={'color': cat_data["color"]}
@@ -37,7 +35,7 @@ class Migration(migrations.Migration):
 
     # Le decimos a Django de qué migración venimos
     dependencies = [
-        ('eventos', '0003_alter_categoria_options_alter_lugar_options_and_more'), # <-- ¡IMPORTANTE! Cambia esto por el nombre de tu migración anterior
+        ('eventos', '0003_alter_categoria_options_alter_lugar_options_and_more'), 
     ]
 
     operations = [

@@ -1,8 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
-// ¡IMPORTANTE! Importamos los servicios que necesita para llenarse.
 import { CategoriaService } from '../../services/categoria.service';
 import { LugarService } from '../../services/lugar.service';
 import { OrganizadorService } from '../../services/organizador.service';

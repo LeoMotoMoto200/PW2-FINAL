@@ -20,7 +20,6 @@
 
   <!-- Contenedor para las cards de eventos -->
   <div *ngIf="!isLoading" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
-    <!-- ¡AQUÍ APLICAMOS LA ANIMACIÓN EN CASCADA! -->
     <ng-container *ngFor="let evento of eventos; let i = index">
       <div class="col">
         <div class="card shadow-sm h-100 shadow-hover card-animation" 

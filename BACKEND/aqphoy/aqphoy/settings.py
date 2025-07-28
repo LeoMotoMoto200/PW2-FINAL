@@ -146,7 +146,7 @@ SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "eventos.serializers.MyTokenObtainPairSerializer",
 }
 
-# Configuración de Email (está perfecta)
+# Configuración de Email 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587

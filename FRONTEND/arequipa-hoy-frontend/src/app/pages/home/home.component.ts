@@ -4,16 +4,15 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { EventService } from '../../services/event.service'; // Importa PaginatedResponse
-
+import { EventService } from '../../services/event.service'; 
 import { Evento, PaginatedResponse } from '../../core/models/evento.model';
-import { FiltroBusquedaComponent } from '../../eventos/filtro-busqueda/filtro-busqueda.component'; // ¡IMPORTANTE!
+import { FiltroBusquedaComponent } from '../../eventos/filtro-busqueda/filtro-busqueda.component';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, FiltroBusquedaComponent], // ¡Añádelo aquí!
+  imports: [CommonModule, RouterLink, FiltroBusquedaComponent], 
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })

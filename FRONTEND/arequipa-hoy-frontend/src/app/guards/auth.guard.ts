@@ -2,10 +2,8 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
-// Esta es la nueva forma de crear guardias en Angular, se le conoce como Guardia Funcional.
 export const authGuard: CanActivateFn = (route, state) => {
   
-  // 'inject' nos permite usar nuestros servicios aquí.
   const authService = inject(AuthService);
   const router = inject(Router);
 

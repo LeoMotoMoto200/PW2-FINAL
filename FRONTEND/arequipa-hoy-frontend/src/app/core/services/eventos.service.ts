@@ -2,9 +2,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators'; // <-- IMPORTA map DE rxjs/operators
+import { map } from 'rxjs/operators'; 
 import { Evento } from '../models/evento.model';
-import { PaginatedResponse } from '../models/evento.model'; // O donde la hayas guardado
+import { PaginatedResponse } from '../models/evento.model'; 
 
 @Injectable({
   providedIn: 'root'

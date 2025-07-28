@@ -1,7 +1,7 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from './services/auth.service'; // Asegúrate de que la ruta sea correcta
+import { AuthService } from './services/auth.service'; 
 
 @Component({
   selector: 'app-root',
@@ -21,12 +21,10 @@ export class AppComponent {
     this.isScrolled = window.scrollY > 10;
   }
 
-  // --- ¡AQUÍ ESTÁ LA FUNCIÓN QUE FALTABA! ---
   logout(): void {
     this.authService.logout();
   }
   
-  // También la función getYear para el footer
   getYear(): number {
     return new Date().getFullYear();
   }

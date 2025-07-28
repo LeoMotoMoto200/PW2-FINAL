@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AuthService } from './auth.service'; // Asegúrate de que esta ruta sea correcta
+import { AuthService } from './auth.service'; 
 import { PaginatedResponse, Evento } from '../core/models/evento.model';
-import { map } from 'rxjs/operators'; // <-- ¡IMPORTANTE! Importa el operador map.
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventService {
-  // La URL base para el CRUD de eventos.
   private apiUrl = 'https://arequipa-hoy-backend.onrender.com/api/eventos/';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
@@ -22,8 +21,6 @@ export class EventService {
     const token = this.authService.getToken();
     if (!token) {
       // Si no hay token, no podemos hacer peticiones autenticadas.
-      // Podríamos lanzar un error o redirigir al login desde aquí.
-      // Por ahora, devolvemos cabeceras vacías, lo que hará que la API falle (lo cual es correcto).
       return new HttpHeaders();
     }
     
@@ -43,9 +40,6 @@ export class EventService {
     return this.http.get<PaginatedResponse<Evento>>(this.apiUrl, { 
       headers: this.getAuthHeaders() // O sin cabeceras si es 100% público
     }).pipe(
-      // ¡AQUÍ ESTÁ LA MAGIA!
-      // El operador 'map' transforma la respuesta.
-      // Recibe el objeto PaginatedResponse completo y devuelve solo la propiedad 'results'.
       map(response => response.results) 
     );
   }
@@ -59,7 +53,6 @@ export class EventService {
     for (const key in filtros) {
       // Solo añadimos los filtros que tienen un valor (no son null, undefined o string vacío).
       if (filtros[key] !== null && filtros[key] !== undefined && filtros[key] !== '') {
-        // En tu backend, los campos se llaman 'categoria', 'lugar', 'organizador', etc.
         params = params.append(key, filtros[key].toString());
       }
     }
@@ -82,7 +75,6 @@ export class EventService {
    * Agrega un nuevo evento. Acepta un FormData para poder subir la imagen.
    */
   addEvent(eventData: FormData): Observable<any> {
-    // Le pasamos 'true' a getAuthHeaders para que sepa que es un FormData.
     return this.http.post(this.apiUrl, eventData, { headers: this.getAuthHeaders(true) });
   }
 
@@ -98,9 +90,9 @@ export class EventService {
       descripcion: eventData.descripcion,
       fecha: eventData.fecha,
       hora: eventData.hora,
-      categoria: eventData.categoria, // Debe ser el ID
-      lugar: eventData.lugar,         // Debe ser el ID
-      organizador: eventData.organizador, // Debe ser el ID
+      categoria: eventData.categoria, 
+      lugar: eventData.lugar,        
+      organizador: eventData.organizador,
     };
     return this.http.put(`${this.apiUrl}${id}/`, payload, { headers: this.getAuthHeaders() });
   }

@@ -2,8 +2,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Observable, of } from 'rxjs'; // Importar Observable y of
-import { catchError } from 'rxjs/operators'; // Importar catchError
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators'; 
 
 import { EventosService } from '../../core/services/eventos.service';
 import { Evento } from '../../core/models/evento.model';

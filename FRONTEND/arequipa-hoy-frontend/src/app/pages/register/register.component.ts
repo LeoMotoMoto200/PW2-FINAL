@@ -14,8 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class RegisterComponent implements OnInit {
   
-  // ¡CORRECCIÓN CLAVE!
-  // El modelo ahora SÍ incluye el campo 'rol' y le damos un valor por defecto.
+  // El modelo ahora incluye el campo 'rol' y le damos un valor por defecto.
   model: any = {
     rol: 'normal' // Por defecto, estará seleccionado "Usuario".
   };
@@ -43,7 +42,7 @@ export class RegisterComponent implements OnInit {
 
     this.isLoading = true;
 
-    // Ahora, el 'this.model' que enviamos contiene el rol seleccionado por el usuario.
+    // El 'this.model' que enviamos contiene el rol seleccionado por el usuario.
     this.authService.register(this.model).subscribe({
       next: () => {
         this.isLoading = false;

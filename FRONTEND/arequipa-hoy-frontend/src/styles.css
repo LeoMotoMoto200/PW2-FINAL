@@ -13,7 +13,7 @@
   --bs-danger: #C62828;    /* Rojo más oscuro para errores */
   --bs-light: #f8f9fa;     /* Gris muy claro */
   --bs-dark: #212529;      /* Negro estándar */
-  --bs-font-sans-serif: 'Poppins', sans-serif; /* ¡Nuestra nueva fuente! */
+  --bs-font-sans-serif: 'Poppins', sans-serif; 
 }
 
 /* --- 2. ESTILOS GLOBALES DEL BODY --- */

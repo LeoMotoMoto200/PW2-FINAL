@@ -4,11 +4,11 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 
-# Importa tus modelos
+# Importamos los modelos
 from .models import Categoria, Organizador, Lugar, Evento, Profile
 
 # --- CLASE PARA MOSTRAR EL PERFIL DENTRO DEL USUARIO ---
-# Esto te permite editar el rol del usuario directamente en la página de edición del usuario.
+# Esto permite editar el rol del usuario directamente en la página de edición del usuario.
 class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
@@ -32,7 +32,7 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 
-# Registra tus otros modelos como ya los tenías
+# Registra otros modelos 
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'color')

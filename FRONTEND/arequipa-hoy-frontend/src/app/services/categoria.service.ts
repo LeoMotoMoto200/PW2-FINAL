@@ -3,7 +3,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Categoria } from '../core/models/categoria.model'; // Importa el modelo que acabas de crear
+import { Categoria } from '../core/models/categoria.model'; 
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,6 @@ export class CategoriaService {
 
   constructor(private http: HttpClient) { }
 
-  // Método para obtener todas las categorías
   getCategorias(): Observable<any> {
     return this.http.get<Categoria[]>(this.apiUrl);
   }
