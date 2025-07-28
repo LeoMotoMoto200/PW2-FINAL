@@ -1,3 +1,5 @@
+![Banner de Arequipa Hoy](BACKEND/aqphoy/static/images/banner.png)
+
 # Arequipa Hoy: Plataforma de Centralización de Eventos Locales
 
 Este repositorio contiene el código fuente y la documentación del proyecto "Arequipa Hoy", una plataforma web desarrollada para centralizar y facilitar el acceso a eventos locales en la ciudad de Arequipa, Perú. El proyecto surge como una solución a la fragmentación informativa que dificulta el descubrimiento de actividades culturales, sociales y recreativas.
