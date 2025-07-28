@@ -66,9 +66,10 @@ El trabajo futuro se centrará en la implementación de las siguientes funcional
 ## Videos
 
 * Giovanni:
-*    **Teoria:**
-*    **https://youtu.be/IvgTi-FSTGI**
+   *    **Teoria:**
+        **https://youtu.be/IvgTi-FSTGI**
+        **https://youtu.be/KaaSMzIiC9Q**
 
-*    ** Laboratorio:**
-*    **https://youtu.be/GpjoJX0uk1o**
-*    **https://youtu.be/t_HyhGVKyzs**
+   *    **Laboratorio:**
+        **https://youtu.be/GpjoJX0uk1o**
+        **https://youtu.be/t_HyhGVKyzs**
