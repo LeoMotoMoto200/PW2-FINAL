@@ -29,22 +29,20 @@ El sistema se basa en una arquitectura de software desacoplada, lo que garantiza
 *   **API:** Interfaz **RESTful** que utiliza el formato **JSON** para un intercambio de información estandarizado y eficiente entre el frontend y el backend.
 
 ### Diagrama de la Arquitectura del Sistema
-*(Aquí puedes insertar la imagen del diagrama)*
-`![Diagrama de Arquitectura](ruta/a/tu/imagen/diagrama.png)`
+BACKEND/aqphoy/staticfiles/project_images/arquitectura.png
 
 ## Vistas de la Aplicación
-*(En esta sección, inserta capturas de pantalla de la interfaz)*
 
 **Formulario de Registro**
-`![Formulario de Registro](ruta/a/tu/imagen/registro.png)`
+BACKEND/aqphoy/staticfiles/project_images/registro.png
 *Descripción: Interfaz para la creación de nuevas cuentas de usuario, permitiendo la selección entre rol de "Usuario" u "Organizador".*
 
 **Página Principal de Eventos (Home)**
-`![Página Principal](ruta/a/tu/imagen/home.png)`
+BACKEND/aqphoy/staticfiles/project_images/home.png
 *Descripción: Galería de eventos presentados en formato de tarjetas. Es la vista principal para los usuarios autenticados.*
 
 **Panel de Administración del Organizador (Dashboard)**
-`![Dashboard del Organizador](ruta/a/tu/imagen/dashboard.png)`
+BACKEND/aqphoy/staticfiles/project_images/dashboard.png
 *Descripción: Panel privado que permite a los organizadores publicar nuevos eventos y gestionar los existentes.*
 
 ## Autores del Proyecto
