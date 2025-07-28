@@ -1,4 +1,4 @@
-![Banner de Arequipa Hoy](BACKEND/aqphoy/static/images/banner.png)
+![Banner de Arequipa Hoy](BACKEND/aqphoy/staticfiles/project_images/banner.png)
 
 # Arequipa Hoy: Plataforma de Centralización de Eventos Locales
 
