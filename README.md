@@ -62,3 +62,13 @@ El trabajo futuro se centrará en la implementación de las siguientes funcional
 *   **Sistema de Recomendación Personalizado:** Desarrollo de un motor basado en aprendizaje automático para sugerir eventos relevantes a los intereses de cada usuario.
 *   **Mejora de Funcionalidades de Búsqueda:** Incorporación de filtros avanzados por rangos de fecha, categorías anidadas y otros atributos.
 *   **Desarrollo de una Aplicación Móvil Nativa:** Creación de versiones para iOS y Android para extender el alcance y la accesibilidad de la plataforma.
+
+## Videos
+
+* Giovanni:
+*    **Teoria:
+*    **https://youtu.be/IvgTi-FSTGI
+
+*    ** Laboratorio:
+*    **https://youtu.be/GpjoJX0uk1o
+*    **https://youtu.be/t_HyhGVKyzs
