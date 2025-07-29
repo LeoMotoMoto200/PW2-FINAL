@@ -76,11 +76,12 @@ El trabajo futuro se centrará en la implementación de las siguientes funcional
 
 * German Chipana:
    *    **Teoria:**
-      *    **https://youtu.be/y8zh8u--EKQ**
-      *    **https://youtu.be/d1PVveJbFis**
+      *    **https://youtu.be/qgyk8m-qsd4**
+      *    **https://youtu.be/myQLDB7MgIc**
 
    *    **Laboratorio:**
-        **https://youtu.be/qgyk8m-qsd4**
+        **https://youtu.be/y8zh8u--EKQ**
+        **https://youtu.be/d1PVveJbFis**
 
 
 ## Coevaluación:
