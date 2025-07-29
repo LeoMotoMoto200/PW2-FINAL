@@ -65,7 +65,7 @@ El trabajo futuro se centrará en la implementación de las siguientes funcional
 
 ## Videos
 
-* Giovanni:
+* Giovanni Mejia:
    *    **Teoria:**
       *    **https://youtu.be/IvgTi-FSTGI**
       *    **https://youtu.be/KaaSMzIiC9Q**
@@ -74,8 +74,22 @@ El trabajo futuro se centrará en la implementación de las siguientes funcional
         **https://youtu.be/GpjoJX0uk1o**
         **https://youtu.be/t_HyhGVKyzs**
 
+* German Chipana:
+   *    **Teoria:**
+      *    **https://youtu.be/y8zh8u--EKQ**
+      *    **https://youtu.be/d1PVveJbFis**
+
+   *    **Laboratorio:**
+        **https://youtu.be/qgyk8m-qsd4**
+
+
 ## Coevaluación:
 * Giovanni:
    * **Palma Apaza Santiago Enrique: 25%** 
    * **Baca Calsin Leonardo Juan Jose: 25%** 
    * **German Arturo Chipana Jeronimo: 25%**
+
+* German:
+   * **Palma Apaza Santiago Enrique: 25%** 
+   * **Baca Calsin Leonardo Juan Jose: 25%** 
+   * **Mejia Rondan Giovanni Patrick: 25%**
