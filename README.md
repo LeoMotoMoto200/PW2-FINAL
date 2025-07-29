@@ -87,6 +87,8 @@ El trabajo futuro se centrará en la implementación de las siguientes funcional
    *    **Teoria:**
       *    **https://youtu.be/jk2DzhCMGaM**
       *    **https://youtu.be/UZqDSdpIAVA**
+      *    **https://youtu.be/fHizXyUtXUg**
+        
 
    *    **Laboratorio:**
         **Estoy en otro laboratorio profesor, con el ing. Escobedo**
