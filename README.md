@@ -83,6 +83,13 @@ El trabajo futuro se centrará en la implementación de las siguientes funcional
         **https://youtu.be/y8zh8u--EKQ**
         **https://youtu.be/d1PVveJbFis**
 
+* Leonardo Baca:
+   *    **Teoria:**
+      *    **https://youtu.be/jk2DzhCMGaM**
+      *    **https://youtu.be/UZqDSdpIAVA**
+
+   *    **Laboratorio:**
+        **Estoy en otro laboratorio profesor, con el ing. Escobedo**
 
 ## Coevaluación:
 * Giovanni:
@@ -93,4 +100,9 @@ El trabajo futuro se centrará en la implementación de las siguientes funcional
 * German:
    * **Palma Apaza Santiago Enrique: 25%** 
    * **Baca Calsin Leonardo Juan Jose: 25%** 
+   * **Mejia Rondan Giovanni Patrick: 25%**
+
+* Leonardo:
+   * **Palma Apaza Santiago Enrique: 25%** 
+   * **German Arturo Chipana Jeronimo: 25%** 
    * **Mejia Rondan Giovanni Patrick: 25%**
