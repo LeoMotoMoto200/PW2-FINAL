@@ -93,6 +93,14 @@ El trabajo futuro se centrará en la implementación de las siguientes funcional
 
    *    **Laboratorio: **
         **Estoy en otro laboratorio profesor, con el ing. Escobedo**
+* Santiago Palma:
+   *    **Teoria:**
+      *    **https://youtu.be/d5gVVX8uSNE**
+      *    **https://youtu.be/bGELBcZDP58**
+
+   *    **Laboratorio:**
+        **https://youtu.be/ONw2FWwyBqE**
+        **https://youtu.be/pZ9mvrGJZaw**
 
 ## Coevaluación:
 * Giovanni:
